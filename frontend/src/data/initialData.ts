@@ -15,6 +15,8 @@ export const INITIAL_HOSPITAL: Hospital = {
   id: 'HOSP-001',
   name: 'Healthcare Center',
   code: 'KLP-MAIN-01',
+  logo: 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224304/healthcare_avatars/avatar_hospital_logo.jpg',
+  tagline: 'Advanced EHR Medical System',
   adminName: 'Dr. Ramesh Chandra (Director)',
   adminEmail: 'director@healthcare.com',
   adminMobile: '+91 98765 43210',
@@ -135,7 +137,7 @@ export const INITIAL_USERS: UserProfile[] = [
     email: 'director@healthcare.com',
     dobOrAge: '56 Years',
     gender: 'Male',
-    profilePhoto: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80',
+    profilePhoto: 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224294/healthcare_avatars/avatar_admin.jpg',
     createdAt: '2024-01-01'
   },
 
@@ -150,7 +152,7 @@ export const INITIAL_USERS: UserProfile[] = [
     dobOrAge: '31 Years',
     gender: 'Male',
     roleTitle: 'Senior Systems & Staff Operations Technician',
-    profilePhoto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+    profilePhoto: 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224295/healthcare_avatars/avatar_technician.jpg',
     createdAt: '2024-07-15'
   },
 
@@ -177,7 +179,7 @@ export const INITIAL_USERS: UserProfile[] = [
     isActive: true,
     clinicName: 'Cardio OPD Wing 2B, Healthcare Center',
     clinicAddress: 'Plot 42, Medical Enclave, Health City, New Delhi',
-    profilePhoto: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80',
+    profilePhoto: 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224296/healthcare_avatars/avatar_doctor_1.jpg',
     createdAt: '2024-03-01'
   },
   {
@@ -202,7 +204,7 @@ export const INITIAL_USERS: UserProfile[] = [
     isActive: true,
     clinicName: 'Neurosciences Suite 3A, Healthcare Center',
     clinicAddress: 'Plot 42, Medical Enclave, Health City, New Delhi',
-    profilePhoto: 'https://images.unsplash.com/photo-1594824813570-87b64010b991?w=150&auto=format&fit=crop&q=80',
+    profilePhoto: 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224342/healthcare_avatars/avatar_doctor_2.jpg',
     createdAt: '2024-04-15'
   },
   {
@@ -227,7 +229,7 @@ export const INITIAL_USERS: UserProfile[] = [
     isActive: true,
     clinicName: 'General OPD Suite 1A, Healthcare Center',
     clinicAddress: 'Plot 42, Medical Enclave, Health City, New Delhi',
-    profilePhoto: 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=150&auto=format&fit=crop&q=80',
+    profilePhoto: 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224297/healthcare_avatars/avatar_doctor_3.jpg',
     createdAt: '2024-05-10'
   },
   {
@@ -252,7 +254,7 @@ export const INITIAL_USERS: UserProfile[] = [
     isActive: true,
     clinicName: 'Orthopedic Suite 2A, Healthcare Center',
     clinicAddress: 'Plot 42, Medical Enclave, Health City, New Delhi',
-    profilePhoto: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&auto=format&fit=crop&q=80',
+    profilePhoto: 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224298/healthcare_avatars/avatar_doctor_4.jpg',
     createdAt: '2024-01-20'
   },
   {
@@ -277,7 +279,7 @@ export const INITIAL_USERS: UserProfile[] = [
     isActive: true,
     clinicName: 'Child Health Wing 1B, Healthcare Center',
     clinicAddress: 'Plot 42, Medical Enclave, Health City, New Delhi',
-    profilePhoto: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&auto=format&fit=crop&q=80',
+    profilePhoto: 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224342/healthcare_avatars/avatar_doctor_2.jpg',
     createdAt: '2024-02-15'
   },
   {
@@ -302,7 +304,7 @@ export const INITIAL_USERS: UserProfile[] = [
     isActive: true,
     clinicName: 'Derma Skin Care Suite 4B, Healthcare Center',
     clinicAddress: 'Plot 42, Medical Enclave, Health City, New Delhi',
-    profilePhoto: 'https://images.unsplash.com/photo-1594824813570-87b64010b991?w=150&auto=format&fit=crop&q=80',
+    profilePhoto: 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224300/healthcare_avatars/avatar_doctor_6.jpg',
     createdAt: '2024-03-20'
   },
   {
@@ -327,7 +329,7 @@ export const INITIAL_USERS: UserProfile[] = [
     isActive: true,
     clinicName: 'Women Health Wing 3C, Healthcare Center',
     clinicAddress: 'Plot 42, Medical Enclave, Health City, New Delhi',
-    profilePhoto: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
+    profilePhoto: 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224300/healthcare_avatars/avatar_doctor_6.jpg',
     createdAt: '2024-01-10'
   },
 
@@ -346,7 +348,7 @@ export const INITIAL_USERS: UserProfile[] = [
     shiftTiming: '08:00 AM - 04:00 PM (Morning Shift)',
     workingHours: '8 Hours / Day',
     isActive: true,
-    profilePhoto: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
+    profilePhoto: 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224300/healthcare_avatars/avatar_receptionist_1.jpg',
     createdAt: '2024-06-01'
   },
   {
@@ -363,7 +365,7 @@ export const INITIAL_USERS: UserProfile[] = [
     shiftTiming: '12:00 PM - 08:00 PM (Evening Shift)',
     workingHours: '8 Hours / Day',
     isActive: true,
-    profilePhoto: 'https://images.unsplash.com/photo-1580894732444-8ecded7900cd?w=150&auto=format&fit=crop&q=80',
+    profilePhoto: 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224302/healthcare_avatars/avatar_receptionist_2.jpg',
     createdAt: '2024-06-15'
   },
 
@@ -1272,7 +1274,7 @@ export const INITIAL_STAFF: StaffMember[] = [
     shiftTiming: '09:00 AM - 04:30 PM (Morning OPD)',
     workingHours: '7.5 Hours / Day',
     isActive: true,
-    profilePhoto: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=200&auto=format&fit=crop&q=80',
+    profilePhoto: 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224296/healthcare_avatars/avatar_doctor_1.jpg',
     createdAt: '2024-03-01'
   },
   {
@@ -1294,7 +1296,7 @@ export const INITIAL_STAFF: StaffMember[] = [
     shiftTiming: '10:00 AM - 05:00 PM (Regular OPD)',
     workingHours: '7 Hours / Day',
     isActive: true,
-    profilePhoto: 'https://images.unsplash.com/photo-1594824813570-87b64010b991?w=200&auto=format&fit=crop&q=80',
+    profilePhoto: 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224342/healthcare_avatars/avatar_doctor_2.jpg',
     createdAt: '2024-04-15'
   },
   {
@@ -1316,7 +1318,7 @@ export const INITIAL_STAFF: StaffMember[] = [
     shiftTiming: '08:30 AM - 03:30 PM (Early OPD)',
     workingHours: '7 Hours / Day',
     isActive: true,
-    profilePhoto: 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=200&auto=format&fit=crop&q=80',
+    profilePhoto: 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224297/healthcare_avatars/avatar_doctor_3.jpg',
     createdAt: '2024-05-10'
   },
   {
@@ -1338,7 +1340,7 @@ export const INITIAL_STAFF: StaffMember[] = [
     shiftTiming: '09:30 AM - 04:00 PM (Regular OPD)',
     workingHours: '6.5 Hours / Day',
     isActive: true,
-    profilePhoto: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=200&auto=format&fit=crop&q=80',
+    profilePhoto: 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224298/healthcare_avatars/avatar_doctor_4.jpg',
     createdAt: '2024-01-20'
   },
   {
@@ -1360,7 +1362,7 @@ export const INITIAL_STAFF: StaffMember[] = [
     shiftTiming: '10:00 AM - 05:30 PM',
     workingHours: '7.5 Hours / Day',
     isActive: true,
-    profilePhoto: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=200&auto=format&fit=crop&q=80',
+    profilePhoto: 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224342/healthcare_avatars/avatar_doctor_2.jpg',
     createdAt: '2024-02-15'
   },
   {
@@ -1382,7 +1384,7 @@ export const INITIAL_STAFF: StaffMember[] = [
     shiftTiming: '11:00 AM - 06:00 PM',
     workingHours: '7 Hours / Day',
     isActive: true,
-    profilePhoto: 'https://images.unsplash.com/photo-1594824813570-87b64010b991?w=200&auto=format&fit=crop&q=80',
+    profilePhoto: 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224300/healthcare_avatars/avatar_doctor_6.jpg',
     createdAt: '2024-03-20'
   },
   {
@@ -1404,7 +1406,7 @@ export const INITIAL_STAFF: StaffMember[] = [
     shiftTiming: '09:00 AM - 03:30 PM',
     workingHours: '6.5 Hours / Day',
     isActive: true,
-    profilePhoto: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&auto=format&fit=crop&q=80',
+    profilePhoto: 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224300/healthcare_avatars/avatar_doctor_6.jpg',
     createdAt: '2024-01-10'
   },
   {
@@ -1424,7 +1426,7 @@ export const INITIAL_STAFF: StaffMember[] = [
     shiftTiming: '08:00 AM - 04:00 PM (Morning Shift)',
     workingHours: '8 Hours / Day',
     isActive: true,
-    profilePhoto: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&auto=format&fit=crop&q=80',
+    profilePhoto: 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224300/healthcare_avatars/avatar_receptionist_1.jpg',
     createdAt: '2024-06-01'
   },
   {
@@ -1444,7 +1446,7 @@ export const INITIAL_STAFF: StaffMember[] = [
     shiftTiming: '12:00 PM - 08:00 PM (Evening Shift)',
     workingHours: '8 Hours / Day',
     isActive: true,
-    profilePhoto: 'https://images.unsplash.com/photo-1580894732444-8ecded7900cd?w=200&auto=format&fit=crop&q=80',
+    profilePhoto: 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224302/healthcare_avatars/avatar_receptionist_2.jpg',
     createdAt: '2024-06-15'
   },
   {
@@ -1464,7 +1466,7 @@ export const INITIAL_STAFF: StaffMember[] = [
     shiftTiming: '09:00 AM - 06:00 PM',
     workingHours: '9 Hours / Day',
     isActive: true,
-    profilePhoto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
+    profilePhoto: 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224295/healthcare_avatars/avatar_technician.jpg',
     createdAt: '2024-07-15'
   }
 ];

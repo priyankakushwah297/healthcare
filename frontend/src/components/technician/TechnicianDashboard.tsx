@@ -34,12 +34,12 @@ import { PortalSidebar } from '../layout/PortalSidebar';
 import { compressImageFile } from '../../utils/imageCompressor';
 
 const PRESET_AVATARS = [
-  { name: 'Senior Cardiologist', url: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=250&auto=format&fit=crop&q=80' },
-  { name: 'Neuro Specialist', url: 'https://images.unsplash.com/photo-1594824813570-87b64010b991?w=250&auto=format&fit=crop&q=80' },
-  { name: 'Physician', url: 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=250&auto=format&fit=crop&q=80' },
-  { name: 'Surgeon', url: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=250&auto=format&fit=crop&q=80' },
-  { name: 'Lead Receptionist', url: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=250&auto=format&fit=crop&q=80' },
-  { name: 'OPD Receptionist', url: 'https://images.unsplash.com/photo-1580894732444-8ecded7900cd?w=250&auto=format&fit=crop&q=80' }
+  { name: 'Senior Cardiologist', url: 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224296/healthcare_avatars/avatar_doctor_1.jpg' },
+  { name: 'Neuro Specialist', url: 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224342/healthcare_avatars/avatar_doctor_2.jpg' },
+  { name: 'Physician', url: 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224297/healthcare_avatars/avatar_doctor_3.jpg' },
+  { name: 'Surgeon', url: 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224298/healthcare_avatars/avatar_doctor_4.jpg' },
+  { name: 'Lead Receptionist', url: 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224300/healthcare_avatars/avatar_receptionist_1.jpg' },
+  { name: 'OPD Receptionist', url: 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224302/healthcare_avatars/avatar_receptionist_2.jpg' }
 ];
 
 export const TechnicianDashboard: React.FC = () => {
