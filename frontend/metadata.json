@@ -1,0 +1,6 @@
+{
+  "name": "Kalpanaaa Healthcare",
+  "description": "Comprehensive hospital management platform for Kalpanaaa Healthcare with dedicated portals for Patients, Doctors, Receptionists, Hospital Admins, Technicians, and Super Admins.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

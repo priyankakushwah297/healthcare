@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+.pnpm-store/
+
+# Production builds
+dist/
+frontend/dist/
+build/
+staticfiles/
+.vercel/
+
+# Python & Django
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.sqlite3
+db.sqlite3
+env/
+venv/
+.venv/
+ENV/
+*.log
+
+# Environment & Secret variables (CRITICAL: Do NOT commit secrets!)
+.env
+.env.local
+.env.*.local
+*.env
+backend/.env
+frontend/.env
+!*.env.example
+!backend/.env.example
+!frontend/.env.example
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
