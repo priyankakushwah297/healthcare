@@ -515,6 +515,8 @@ export const Header: React.FC = () => {
           {/* Right-Side Drawer Container */}
           <div className="relative w-[85%] max-w-xs h-full bg-white shadow-2xl overflow-y-auto border-l border-slate-200 animate-slideInRight z-10 flex flex-col justify-between p-4">
             <PortalSidebar
+              currentSubTab={activeTab}
+              onSelectSubTab={(tabId) => setActiveTab(tabId)}
               onClose={() => setMobilePortalMenuOpen(false)}
               isMobileDrawer={true}
             />
