@@ -40,45 +40,42 @@ export const LandingPage: React.FC = () => {
       
       {/* HERO SECTION */}
       <section id="home" className="relative scroll-mt-24 pt-2 pb-2">
-        <div className="relative rounded-3xl p-8 sm:p-12 text-[#0C2B4E] shadow-[0_12px_40px_-10px_rgba(2,132,199,0.12)] border border-sky-200/80 bg-gradient-to-br from-[#E0F2FE] via-[#F0F9FF] to-[#E6F4FE] overflow-hidden">
+        <div className="relative rounded-3xl overflow-hidden text-[#0C2B4E] shadow-[0_12px_40px_-10px_rgba(2,132,199,0.12)] border border-sky-200/80 bg-gradient-to-br from-[#E0F2FE] via-[#F0F9FF] to-[#E6F4FE]">
 
-          {/* Glow Flares */}
-          <div className="absolute -top-24 -right-24 w-96 h-96 bg-sky-400/20 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-teal-400/15 rounded-full blur-3xl pointer-events-none" />
+          {/* Glow Flare */}
+          <div className="absolute -top-24 -left-24 w-96 h-96 bg-sky-400/20 rounded-full blur-3xl pointer-events-none" />
 
-          {/* Two-column layout: Left content + Right doctor image */}
-          <div className="relative z-10 flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+          {/* ── TWO-COLUMN GRID: LEFT = text  |  RIGHT = image ── */}
+          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-[1fr_340px] xl:grid-cols-[1fr_400px] items-stretch">
 
-            {/* LEFT COLUMN – All text content & buttons */}
-            <div className="flex-1 space-y-8 min-w-0">
+            {/* ── LEFT: Heading · Description · Buttons · Stats ── */}
+            <div className="flex flex-col justify-center gap-7 p-8 sm:p-10 lg:p-12">
 
               {/* NABH Badge */}
-              <div>
-                <div className="inline-flex items-center space-x-2 bg-white/90 text-[#0284C7] px-4 py-1.5 rounded-full text-xs font-bold border border-sky-300/80 shadow-2xs backdrop-blur-md">
-                  <ShieldCheck className="w-4 h-4 text-[#0284C7]" />
-                  <span>NABH &amp; JCI Accredited Super-Speciality Medical Care</span>
-                </div>
+              <div className="inline-flex items-center space-x-2 bg-white/90 text-[#0284C7] px-4 py-1.5 rounded-full text-xs font-bold border border-sky-300/80 shadow-sm backdrop-blur-md w-fit">
+                <ShieldCheck className="w-4 h-4 text-[#0284C7]" />
+                <span>NABH &amp; JCI Accredited Super-Speciality Medical Care</span>
               </div>
 
-              {/* Heading */}
-              <div className="space-y-4 max-w-2xl">
-                <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-[#0C2B4E] tracking-tight leading-[1.15]">
+              {/* Heading + Subtitle */}
+              <div className="space-y-3">
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-extrabold text-[#0C2B4E] tracking-tight leading-[1.15]">
                   Healthcare crafted with{' '}
                   <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#0284C7] via-[#0D9488] to-[#2563EB]">
                     precision &amp; empathy.
                   </span>
                 </h1>
-                <p className="text-sm sm:text-base text-[#334E68] leading-relaxed max-w-2xl font-medium">
+                <p className="text-sm sm:text-base text-[#334E68] leading-relaxed font-medium max-w-xl">
                   Welcome to {hospital.name || 'Healthcare Center'}. World-class clinical diagnostics, distinguished specialists, and compassionate 24/7 patient support designed seamlessly around your health.
                 </p>
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-wrap items-center gap-4 pt-2">
+              <div className="flex flex-wrap gap-3">
                 <button
                   id="hero-book-appointment-btn"
                   onClick={handleConsultationClick}
-                  className="apple-btn-primary px-6 py-3.5 rounded-xl text-sm font-semibold shadow-md shadow-sky-500/25 flex items-center space-x-2 cursor-pointer active:scale-[0.98]"
+                  className="apple-btn-primary px-6 py-3 rounded-xl text-sm font-semibold shadow-md shadow-sky-500/25 flex items-center space-x-2 cursor-pointer active:scale-[0.98]"
                 >
                   <Calendar className="w-4 h-4 text-[#38BDF8]" />
                   <span>Book Appointment</span>
@@ -87,7 +84,7 @@ export const LandingPage: React.FC = () => {
                 <button
                   id="hero-patient-login-btn"
                   onClick={() => openAuthModal()}
-                  className="bg-white hover:bg-sky-50/80 text-[#0C2B4E] border border-sky-200 shadow-2xs hover:shadow-xs px-6 py-3.5 rounded-xl text-sm font-semibold transition-all backdrop-blur-md flex items-center space-x-2 cursor-pointer active:scale-[0.98]"
+                  className="bg-white hover:bg-sky-50 text-[#0C2B4E] border border-sky-200 shadow-sm px-6 py-3 rounded-xl text-sm font-semibold transition-all flex items-center space-x-2 cursor-pointer active:scale-[0.98]"
                 >
                   <User className="w-4 h-4 text-[#0284C7]" />
                   <span>Patient Portal</span>
@@ -95,50 +92,38 @@ export const LandingPage: React.FC = () => {
 
                 <a
                   href="tel:102"
-                  className="bg-rose-50 hover:bg-rose-100/80 text-rose-700 border border-rose-200 px-5 py-3.5 rounded-xl text-sm font-semibold transition-all flex items-center space-x-2 cursor-pointer active:scale-[0.98] shadow-2xs"
+                  className="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 px-5 py-3 rounded-xl text-sm font-semibold transition-all flex items-center space-x-2 active:scale-[0.98] shadow-sm"
                 >
                   <PhoneCall className="w-4 h-4 text-rose-600" />
                   <span>24/7 Emergency: +91 98765 43211 / 102</span>
                 </a>
               </div>
 
-              {/* Stats Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-8 border-t border-sky-200/80">
-                <div className="p-4 bg-white/80 hover:bg-white rounded-2xl border border-sky-100 shadow-xs transition-all duration-300 backdrop-blur-md">
-                  <p className="text-2xl sm:text-3xl font-extrabold text-[#0C2B4E] tracking-tight">350+</p>
-                  <p className="text-xs text-[#486581] font-semibold mt-1">Smart Inpatient Beds</p>
-                </div>
-                <div className="p-4 bg-white/80 hover:bg-white rounded-2xl border border-sky-100 shadow-xs transition-all duration-300 backdrop-blur-md">
-                  <p className="text-2xl sm:text-3xl font-extrabold text-[#0C2B4E] tracking-tight">45+</p>
-                  <p className="text-xs text-[#486581] font-semibold mt-1">Senior Specialists</p>
-                </div>
-                <div className="p-4 bg-white/80 hover:bg-white rounded-2xl border border-sky-100 shadow-xs transition-all duration-300 backdrop-blur-md">
-                  <p className="text-2xl sm:text-3xl font-extrabold text-[#0D9488] tracking-tight">99.4%</p>
-                  <p className="text-xs text-[#486581] font-semibold mt-1">Clinical Satisfaction</p>
-                </div>
-                <div className="p-4 bg-white/80 hover:bg-white rounded-2xl border border-sky-100 shadow-xs transition-all duration-300 backdrop-blur-md">
-                  <p className="text-2xl sm:text-3xl font-extrabold text-[#0284C7] tracking-tight">24/7</p>
-                  <p className="text-xs text-[#486581] font-semibold mt-1">Trauma &amp; ICU Support</p>
-                </div>
+              {/* Stats */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-5 border-t border-sky-200/80">
+                {[
+                  { val: '350+',  label: 'Smart Inpatient Beds', color: 'text-[#0C2B4E]' },
+                  { val: '45+',   label: 'Senior Specialists',   color: 'text-[#0C2B4E]' },
+                  { val: '99.4%', label: 'Clinical Satisfaction',color: 'text-[#0D9488]' },
+                  { val: '24/7',  label: 'Trauma & ICU Support', color: 'text-[#0284C7]' },
+                ].map(({ val, label, color }) => (
+                  <div key={label} className="p-3 bg-white/80 hover:bg-white rounded-2xl border border-sky-100 shadow-xs transition-all backdrop-blur-md">
+                    <p className={`text-xl sm:text-2xl font-extrabold tracking-tight ${color}`}>{val}</p>
+                    <p className="text-[10px] text-[#486581] font-semibold mt-0.5">{label}</p>
+                  </div>
+                ))}
               </div>
-
             </div>
-            {/* RIGHT COLUMN – Doctor Image */}
-            <div className="hidden lg:block absolute top-0 right-0 h-full w-[420px] xl:w-[480px] pointer-events-none">
-              {/* Glow ring behind image */}
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-sky-400/30 via-blue-400/20 to-teal-400/25 blur-2xl scale-105 pointer-events-none" />
-              <img
-                src="/hero-doctor.jpg"
-                alt="Doctor holding digital globe"
-                className="relative z-10 w-full h-full object-cover object-top rounded-r-3xl shadow-[0_20px_60px_-15px_rgba(2,132,199,0.4)]"
-              />
-              {/* Floating badge on image */}
-              <div className="absolute bottom-8 left-5 z-20 bg-white/95 backdrop-blur-md rounded-xl px-4 py-2.5 shadow-lg border border-sky-200 flex items-center gap-2 pointer-events-auto">
-                <Activity className="w-4 h-4 text-[#0D9488]" />
-                <div>
-                  <p className="text-xs font-extrabold text-[#0C2B4E]">AI-Powered Care</p>
-                  <p className="text-[10px] text-[#486581] font-medium">Smart Diagnostics &amp; EHR</p>
-                </div>
+
+            {/* ── RIGHT: Doctor Image ── */}
+            <div className="relative flex items-center justify-center p-4 lg:p-6">
+              <div className="relative w-full h-full max-h-[460px] rounded-2xl overflow-hidden shadow-[0_16px_48px_-12px_rgba(2,132,199,0.30)] border border-sky-200/80 bg-transparent">
+                {/* Image: fills cleanly without letterboxing or black bars */}
+                <img
+                  src="/hero-doctor.jpg"
+                  alt="Doctor holding digital globe"
+                  className="w-full h-full object-cover object-center"
+                />
               </div>
             </div>
 
