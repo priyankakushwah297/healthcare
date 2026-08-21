@@ -1089,7 +1089,7 @@ export const DoctorDashboard: React.FC = () => {
               <div className="bg-white rounded-2xl p-6 border border-[#E2E8F0] shadow-xs space-y-4">
                 <div className="text-center pb-4 border-b border-slate-100">
                   <img
-                    src={docPhoto || 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=250&auto=format&fit=crop&q=80'}
+                    src={docPhoto || 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224296/healthcare_avatars/avatar_doctor_1.jpg'}
                     alt={docName}
                     className="w-16 h-16 rounded-2xl object-cover mx-auto mb-2 border-2 border-slate-200 shadow-xs"
                   />

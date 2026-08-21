@@ -95,12 +95,7 @@ const getDeletedStaffKeys = (): Set<string> => {
     const saved = localStorage.getItem(STORAGE_KEYS.DELETED_STAFF);
     if (!saved) return new Set<string>();
     const parsed: string[] = JSON.parse(saved);
-    const technicianKeys = new Set(['usr-technician-1', 'stf-10', 'TECH-KLP-01', '9876543260', 'karan malhotra']);
-    const filtered = parsed.filter(k => !technicianKeys.has(k));
-    try {
-      localStorage.setItem(STORAGE_KEYS.DELETED_STAFF, JSON.stringify(filtered));
-    } catch {}
-    return new Set<string>(filtered);
+    return new Set<string>(parsed);
   } catch {
     return new Set<string>();
   }
@@ -121,38 +116,29 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return currentUser ? currentUser.role : 'guest';
   });
 
-  // App data state
+  // Initial local state with fallback
   const [users, setUsers] = useState<UserProfile[]>(() => {
     const deleted = getDeletedStaffKeys();
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.USERS);
       if (saved) {
-        const parsed = JSON.parse(saved);
+        const parsed: UserProfile[] = JSON.parse(saved);
         const map = new Map<string, UserProfile>();
         INITIAL_USERS.forEach(u => {
-          const isDeleted = deleted.has(u.id) || deleted.has(u.staffId || '') || deleted.has(u.doctorId || '') || deleted.has((u.fullName || '').trim().toLowerCase());
-          if (!isDeleted) map.set(u.id, u);
-        });
-        parsed.forEach((u: UserProfile) => {
-          const isDeleted = deleted.has(u.id) || deleted.has(u.staffId || '') || deleted.has(u.doctorId || '') || deleted.has((u.fullName || '').trim().toLowerCase());
-          if (!isDeleted) {
-            const seed = INITIAL_USERS.find(s => s.id === u.id || (Boolean(s.staffId) && Boolean(u.staffId) && s.role === u.role && s.staffId === u.staffId) || (s.fullName && u.fullName && s.fullName.toLowerCase() === u.fullName.toLowerCase()));
-            if (seed) {
-              map.set(u.id, { ...seed, ...u, profilePhoto: u.profilePhoto || seed.profilePhoto });
-            } else {
-              map.set(u.id, u);
-            }
+          if (!deleted.has(u.id) && !deleted.has(u.staffId || '') && !deleted.has(u.doctorId || '') && !deleted.has((u.fullName || '').trim().toLowerCase())) {
+            map.set(u.id, u);
           }
         });
-        const techSeed = INITIAL_USERS.find(u => u.role === 'technician');
-        if (techSeed && !map.has(techSeed.id)) {
-          map.set(techSeed.id, techSeed);
-        }
+        parsed.forEach(u => {
+          if (!deleted.has(u.id) && !deleted.has(u.staffId || '') && !deleted.has(u.doctorId || '') && !deleted.has((u.fullName || '').trim().toLowerCase())) {
+            map.set(u.id, u);
+          }
+        });
         return Array.from(map.values());
       }
-      return INITIAL_USERS.filter(u => !deleted.has(u.id) && !deleted.has(u.staffId || '') && !deleted.has(u.doctorId || '') && !deleted.has((u.fullName || '').trim().toLowerCase()));
+      return INITIAL_USERS.filter(u => !deleted.has(u.id));
     } catch {
-      return INITIAL_USERS.filter(u => !deleted.has(u.id) && !deleted.has(u.staffId || '') && !deleted.has(u.doctorId || '') && !deleted.has((u.fullName || '').trim().toLowerCase()));
+      return INITIAL_USERS;
     }
   });
 
@@ -160,10 +146,10 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.APPOINTMENTS);
       if (saved) {
-        const parsed = JSON.parse(saved);
+        const parsed: Appointment[] = JSON.parse(saved);
         const map = new Map<string, Appointment>();
-        INITIAL_APPOINTMENTS.forEach(a => map.set(a.id || a.bookingRef, a));
-        parsed.forEach((a: Appointment) => map.set(a.id || a.bookingRef, a));
+        INITIAL_APPOINTMENTS.forEach(a => map.set(a.bookingRef || a.id, a));
+        parsed.forEach(a => map.set(a.bookingRef || a.id, a));
         return Array.from(map.values());
       }
       return INITIAL_APPOINTMENTS;
@@ -176,10 +162,10 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.PRESCRIPTIONS);
       if (saved) {
-        const parsed = JSON.parse(saved);
+        const parsed: Prescription[] = JSON.parse(saved);
         const map = new Map<string, Prescription>();
-        INITIAL_PRESCRIPTIONS.forEach(p => map.set(p.id || p.prescriptionNumber, p));
-        parsed.forEach((p: Prescription) => map.set(p.id || p.prescriptionNumber, p));
+        INITIAL_PRESCRIPTIONS.forEach(p => map.set(p.prescriptionNumber || p.id, p));
+        parsed.forEach(p => map.set(p.prescriptionNumber || p.id, p));
         return Array.from(map.values());
       }
       return INITIAL_PRESCRIPTIONS;
@@ -192,10 +178,10 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.LAB_REPORTS);
       if (saved) {
-        const parsed = JSON.parse(saved);
+        const parsed: LabReport[] = JSON.parse(saved);
         const map = new Map<string, LabReport>();
-        INITIAL_LAB_REPORTS.forEach(l => map.set(l.id || l.reportNumber, l));
-        parsed.forEach((l: LabReport) => map.set(l.id || l.reportNumber, l));
+        INITIAL_LAB_REPORTS.forEach(l => map.set(l.reportNumber || l.id, l));
+        parsed.forEach(l => map.set(l.reportNumber || l.id, l));
         return Array.from(map.values());
       }
       return INITIAL_LAB_REPORTS;
@@ -204,7 +190,7 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   });
 
-  const [medicalHistory, setMedicalHistory] = useState<MedicalHistoryRecord[]>(INITIAL_MEDICAL_HISTORY);
+  const [medicalHistory] = useState<MedicalHistoryRecord[]>(INITIAL_MEDICAL_HISTORY);
   const [departments] = useState<DepartmentInfo[]>(INITIAL_DEPARTMENTS);
 
   const [staff, setStaff] = useState<StaffMember[]>(() => {
@@ -216,28 +202,19 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         const map = new Map<string, StaffMember>();
         INITIAL_STAFF.forEach(s => {
           if (!deleted.has(s.id) && !deleted.has(s.staffId) && !deleted.has((s.fullName || s.name || '').trim().toLowerCase())) {
-            map.set(s.id, s);
+            map.set(s.staffId || s.id, s);
           }
         });
-        parsed.forEach((s: StaffMember) => {
+        parsed.forEach(s => {
           if (!deleted.has(s.id) && !deleted.has(s.staffId) && !deleted.has((s.fullName || s.name || '').trim().toLowerCase())) {
-            const seed = INITIAL_STAFF.find(st => st.id === s.id || st.staffId === s.staffId || (st.fullName && s.fullName && st.fullName.toLowerCase() === s.fullName.toLowerCase()));
-            if (seed) {
-              map.set(s.id, { ...seed, ...s, profilePhoto: s.profilePhoto || seed.profilePhoto });
-            } else {
-              map.set(s.id, s);
-            }
+            map.set(s.staffId || s.id, s);
           }
         });
-        const techStaffSeed = INITIAL_STAFF.find(s => s.type === 'technician' || s.staffType === 'technician');
-        if (techStaffSeed && !map.has(techStaffSeed.id)) {
-          map.set(techStaffSeed.id, techStaffSeed);
-        }
         return Array.from(map.values());
       }
-      return INITIAL_STAFF.filter(s => !deleted.has(s.id) && !deleted.has(s.staffId) && !deleted.has((s.fullName || s.name || '').trim().toLowerCase()));
+      return INITIAL_STAFF.filter(s => !deleted.has(s.id) && !deleted.has(s.staffId));
     } catch {
-      return INITIAL_STAFF.filter(s => !deleted.has(s.id) && !deleted.has(s.staffId) && !deleted.has((s.fullName || s.name || '').trim().toLowerCase()));
+      return INITIAL_STAFF;
     }
   });
 
@@ -263,7 +240,6 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const PUBLIC_TABS = ['home', 'about', 'services', 'doctors', 'contact'];
 
-  // UI state with initial route guard
   const [activeTab, setActiveTabRaw] = useState<string>(() => {
     return currentUser ? 'dashboard' : 'home';
   });
@@ -279,7 +255,7 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const [isBookModalOpen, setIsBookModalOpen] = useState<boolean>(false);
 
-  // Keep localStorage synchronized & lock active tab to portal for logged-in users
+  // Sync current user to localStorage
   useEffect(() => {
     try {
       if (currentUser) {
@@ -315,57 +291,43 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
-    } catch (err) {
-      console.warn('LocalStorage error syncing users:', err);
-    }
+    } catch {}
   }, [users]);
 
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEYS.APPOINTMENTS, JSON.stringify(appointments));
-    } catch (err) {
-      console.warn('LocalStorage error syncing appointments:', err);
-    }
+    } catch {}
   }, [appointments]);
 
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEYS.PRESCRIPTIONS, JSON.stringify(prescriptions));
-    } catch (err) {
-      console.warn('LocalStorage error syncing prescriptions:', err);
-    }
+    } catch {}
   }, [prescriptions]);
 
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEYS.LAB_REPORTS, JSON.stringify(labReports));
-    } catch (err) {
-      console.warn('LocalStorage error syncing lab reports:', err);
-    }
+    } catch {}
   }, [labReports]);
 
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEYS.STAFF, JSON.stringify(staff));
-    } catch (err) {
-      console.warn('LocalStorage error syncing staff:', err);
-    }
+    } catch {}
   }, [staff]);
 
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(notifications));
-    } catch (err) {
-      console.warn('LocalStorage error syncing notifications:', err);
-    }
+    } catch {}
   }, [notifications]);
 
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEYS.HOSPITAL, JSON.stringify(hospital));
-    } catch (err) {
-      console.warn('LocalStorage error syncing hospital:', err);
-    }
+    } catch {}
   }, [hospital]);
 
   // =========================================================================
@@ -379,46 +341,7 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const deleted = getDeletedStaffKeys();
 
     try {
-      // 1. Fetch & Merge Appointments
-      const remoteApts = await api.fetchAppointments();
-      if (remoteApts && Array.isArray(remoteApts) && remoteApts.length > 0) {
-        setAppointments(prev => {
-          const map = new Map<string, Appointment>();
-          INITIAL_APPOINTMENTS.forEach(a => map.set(a.bookingRef || a.id, a));
-          prev.forEach(a => map.set(a.bookingRef || a.id, a));
-          remoteApts.forEach(a => map.set(a.bookingRef || a.id, a));
-          const merged = Array.from(map.values()).sort((a, b) => {
-            return (b.createdAt || '').localeCompare(a.createdAt || '') || (b.bookingRef || '').localeCompare(a.bookingRef || '');
-          });
-          return merged;
-        });
-      }
-
-      // 2. Fetch & Merge Prescriptions
-      const remoteRx = await api.fetchPrescriptions();
-      if (remoteRx && Array.isArray(remoteRx) && remoteRx.length > 0) {
-        setPrescriptions(prev => {
-          const map = new Map<string, Prescription>();
-          INITIAL_PRESCRIPTIONS.forEach(p => map.set(p.prescriptionNumber || p.id, p));
-          prev.forEach(p => map.set(p.prescriptionNumber || p.id, p));
-          remoteRx.forEach(p => map.set(p.prescriptionNumber || p.id, p));
-          return Array.from(map.values());
-        });
-      }
-
-      // 3. Fetch & Merge Lab Reports
-      const remoteLab = await api.fetchLabReports();
-      if (remoteLab && Array.isArray(remoteLab) && remoteLab.length > 0) {
-        setLabReports(prev => {
-          const map = new Map<string, LabReport>();
-          INITIAL_LAB_REPORTS.forEach(l => map.set(l.reportNumber || l.id, l));
-          prev.forEach(l => map.set(l.reportNumber || l.id, l));
-          remoteLab.forEach(l => map.set(l.reportNumber || l.id, l));
-          return Array.from(map.values());
-        });
-      }
-
-      // 4. Fetch & Merge Staff Members
+      // 1. Fetch & Merge Staff Members from Database
       const remoteStaff = await api.fetchStaff();
       if (remoteStaff && Array.isArray(remoteStaff) && remoteStaff.length > 0) {
         setStaff(prev => {
@@ -435,15 +358,14 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           });
           remoteStaff.forEach(s => {
             if (!deleted.has(s.id) && !deleted.has(s.staffId) && !deleted.has((s.fullName || s.name || '').trim().toLowerCase())) {
-              const existing = map.get(s.staffId || s.id);
-              map.set(s.staffId || s.id, { ...existing, ...s, profilePhoto: s.profilePhoto || existing?.profilePhoto });
+              map.set(s.staffId || s.id, s);
             }
           });
           return Array.from(map.values());
         });
       }
 
-      // 5. Fetch & Merge Registered Users & Patients
+      // 2. Fetch & Merge Registered Users & Patients
       const remoteUsers = await api.fetchUsers();
       if (remoteUsers && Array.isArray(remoteUsers) && remoteUsers.length > 0) {
         setUsers(prev => {
@@ -466,6 +388,66 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           return Array.from(map.values());
         });
       }
+
+      // 3. Fetch & Merge Appointments
+      const remoteApts = await api.fetchAppointments();
+      if (remoteApts && Array.isArray(remoteApts) && remoteApts.length > 0) {
+        setAppointments(prev => {
+          const map = new Map<string, Appointment>();
+          INITIAL_APPOINTMENTS.forEach(a => map.set(a.bookingRef || a.id, a));
+          prev.forEach(a => map.set(a.bookingRef || a.id, a));
+          remoteApts.forEach(a => map.set(a.bookingRef || a.id, a));
+          const merged = Array.from(map.values()).sort((a, b) => {
+            return (b.createdAt || '').localeCompare(a.createdAt || '') || (b.bookingRef || '').localeCompare(a.bookingRef || '');
+          });
+          return merged;
+        });
+      }
+
+      // 4. Fetch & Merge Prescriptions
+      const remoteRx = await api.fetchPrescriptions();
+      if (remoteRx && Array.isArray(remoteRx) && remoteRx.length > 0) {
+        setPrescriptions(prev => {
+          const map = new Map<string, Prescription>();
+          INITIAL_PRESCRIPTIONS.forEach(p => map.set(p.prescriptionNumber || p.id, p));
+          prev.forEach(p => map.set(p.prescriptionNumber || p.id, p));
+          remoteRx.forEach(p => map.set(p.prescriptionNumber || p.id, p));
+          return Array.from(map.values());
+        });
+      }
+
+      // 5. Fetch & Merge Lab Reports
+      const remoteLab = await api.fetchLabReports();
+      if (remoteLab && Array.isArray(remoteLab) && remoteLab.length > 0) {
+        setLabReports(prev => {
+          const map = new Map<string, LabReport>();
+          INITIAL_LAB_REPORTS.forEach(l => map.set(l.reportNumber || l.id, l));
+          prev.forEach(l => map.set(l.reportNumber || l.id, l));
+          remoteLab.forEach(l => map.set(l.reportNumber || l.id, l));
+          return Array.from(map.values());
+        });
+      }
+
+      // 6. Fetch & Merge Hospital Info
+      const remoteHospital = await api.fetchHospital();
+      if (remoteHospital && remoteHospital.name) {
+        setHospital(prev => ({
+          ...prev,
+          name: remoteHospital.name || prev.name,
+          tagline: remoteHospital.tagline || prev.tagline,
+          logo: remoteHospital.logo || prev.logo,
+          phone: remoteHospital.phone || prev.phone,
+          emergencyPhone: remoteHospital.emergency_phone || remoteHospital.emergencyPhone || prev.emergencyPhone,
+          address: remoteHospital.address || prev.address,
+          totalBeds: remoteHospital.total_beds || remoteHospital.totalBeds || prev.totalBeds,
+          occupiedBeds: remoteHospital.occupied_beds || remoteHospital.occupiedBeds || prev.occupiedBeds,
+          icuBeds: remoteHospital.icu_beds || remoteHospital.icuBeds || prev.icuBeds,
+          ambulances: remoteHospital.ambulances || prev.ambulances,
+          departments: remoteHospital.departments && Array.isArray(remoteHospital.departments) && remoteHospital.departments.length > 0
+            ? remoteHospital.departments
+            : prev.departments
+        }));
+      }
     } catch (err) {
       console.warn('Real-time sync notice:', err);
     } finally {
@@ -473,14 +455,13 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, []);
 
-  // Initial fetch on mount & background polling every 5 seconds + visibility listener
+  // Initial fetch on mount & background polling every 4 seconds + visibility/focus listeners
   useEffect(() => {
     refreshBackendData();
 
-    // 5-second polling interval to capture appointments/prescriptions created on other phones/laptops
     const intervalId = setInterval(() => {
       refreshBackendData();
-    }, 5000);
+    }, 4000);
 
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
@@ -512,7 +493,6 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       return { exists: false, user: undefined };
     }
 
-    // 1. Check in active state users
     let found = users.find(u => {
       const isDeleted = deleted.has(u.id) || deleted.has(u.staffId || '') || deleted.has(u.doctorId || '') || deleted.has((u.fullName || '').trim().toLowerCase()) || deleted.has((u.mobile || '').replace(/[^0-9]/g, ''));
       if (isDeleted) return false;
@@ -520,7 +500,6 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       return uMobile === cleanPhone || (cleanPhone.length >= 10 && uMobile.endsWith(cleanPhone.slice(-10)));
     });
 
-    // 2. Check in staff list
     if (!found) {
       const staffMember = staff.find(s => {
         const isDeleted = deleted.has(s.id) || deleted.has(s.staffId || '') || deleted.has((s.fullName || s.name || '').trim().toLowerCase()) || deleted.has((s.mobile || '').replace(/[^0-9]/g, ''));
@@ -543,7 +522,6 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       }
     }
 
-    // 3. Default Admin fallback numbers
     if (!found && (cleanPhone === '9876543210' || cleanPhone === '9876543240') && !deleted.has(cleanPhone)) {
       found = INITIAL_USERS.find(u => u.role === 'admin') || {
         id: 'usr-admin-1',
@@ -571,7 +549,7 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return new Promise<{ success: boolean; otp: string }>((resolve) => {
       setTimeout(() => {
         resolve({ success: true, otp: '123456' });
-      }, 400);
+      }, 300);
     });
   };
 
@@ -583,7 +561,6 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     let { exists, user } = checkPhoneExists(cleanPhone);
 
-    // If not in memory yet, check backend database
     if (!exists || !user) {
       try {
         const backendCheck = await api.checkPhone(cleanPhone);
@@ -628,7 +605,6 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setActiveTab('dashboard');
     setIsAuthModalOpen(false);
     
-    // Trigger immediate sync
     refreshBackendData();
     return { success: true, user };
   };
@@ -640,6 +616,19 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const patientId = userData.role === 'doctor' 
       ? `DOC-KLP-${200 + users.filter(u => u.role === 'doctor').length}`
       : `PAT-2026-${patientNum}`;
+
+    let profilePhoto = userData.profilePhoto || (userData.gender === 'Female'
+      ? 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224300/healthcare_avatars/avatar_receptionist_1.jpg'
+      : 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224303/healthcare_avatars/avatar_patient.jpg');
+
+    if (profilePhoto.startsWith('data:image')) {
+      try {
+        const uploadRes = await api.uploadImage(profilePhoto);
+        if (uploadRes && uploadRes.url) {
+          profilePhoto = uploadRes.url;
+        }
+      } catch {}
+    }
 
     const newUser: UserProfile = {
       id: newId,
@@ -654,9 +643,7 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       bloodGroup: userData.bloodGroup || 'O+',
       address: userData.address || '',
       emergencyContact: userData.emergencyContact || '',
-      profilePhoto: userData.gender === 'Female'
-        ? 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224300/healthcare_avatars/avatar_receptionist_1.jpg'
-        : 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224303/healthcare_avatars/avatar_patient.jpg',
+      profilePhoto,
       createdAt: new Date().toISOString().split('T')[0],
       ...(userData.role === 'doctor' ? {
         specialization: userData.specialization || 'Consultant Specialist',
@@ -672,29 +659,7 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       } : {})
     };
 
-    // 1. Sync to Supabase PostgreSQL database
-    try {
-      await api.registerUser({
-        full_name: newUser.fullName,
-        mobile_number: newUser.mobile,
-        email: newUser.email,
-        role: newUser.role,
-        gender: newUser.gender,
-        dob: newUser.dobOrAge,
-        blood_group: newUser.bloodGroup,
-        specialization: newUser.specialization,
-        department: newUser.department,
-        user_id: patientId
-      });
-    } catch (err) {
-      console.warn('Backend API registration notice:', err);
-    }
-
-    // 2. Persist in state & LocalStorage
-    setUsers(prev => {
-      const updated = [newUser, ...prev.filter(u => (u.mobile || (u as any).mobileNumber || '').replace(/[^0-9]/g, '') !== cleanMobile)];
-      return updated;
-    });
+    setUsers(prev => [newUser, ...prev.filter(u => (u.mobile || (u as any).mobileNumber || '').replace(/[^0-9]/g, '') !== cleanMobile)]);
 
     if (newUser.role !== 'patient') {
       const newStaff: StaffMember = {
@@ -726,16 +691,24 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setActiveTab('dashboard');
     setIsAuthModalOpen(false);
 
-    const welcomeNotif: AppNotification = {
-      id: `notif-${Date.now()}`,
-      userId: newUser.id,
-      type: 'system',
-      title: 'Welcome to Healthcare Center',
-      message: `Account created successfully. Your Unique ID is ${patientId}.`,
-      date: new Date().toISOString(),
-      isRead: false
-    };
-    setNotifications(prev => [welcomeNotif, ...prev]);
+    try {
+      await api.registerUser({
+        full_name: newUser.fullName,
+        mobile_number: newUser.mobile,
+        email: newUser.email,
+        role: newUser.role,
+        gender: newUser.gender,
+        dob: newUser.dobOrAge,
+        blood_group: newUser.bloodGroup,
+        specialization: newUser.specialization,
+        department: newUser.department,
+        user_id: patientId,
+        profile_photo: profilePhoto
+      });
+      refreshBackendData();
+    } catch (err) {
+      console.warn('Backend registration notice:', err);
+    }
 
     return { success: true, user: newUser };
   };
@@ -779,7 +752,7 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setCurrentRole(role);
       setActiveTab('dashboard');
     } else {
-      alert(`No active ${role.toUpperCase()} profile exists in the system. Please add a new ${role} from the Admin Dashboard.`);
+      alert(`No active ${role.toUpperCase()} profile exists. You can add one from the Admin Dashboard.`);
       if (currentUser?.role === role) {
         logout();
       }
@@ -805,10 +778,8 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       createdAt: new Date().toISOString().split('T')[0]
     };
 
-    // 1. Immediate optimistic UI update
     setAppointments(prev => [newApt, ...prev]);
 
-    // 2. Persist to Supabase PostgreSQL database
     try {
       const saved = await api.bookAppointment({
         booking_ref: bookingRef,
@@ -835,11 +806,11 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       if (saved) {
         setAppointments(prev => prev.map(a => a.bookingRef === bookingRef ? { ...a, ...saved } : a));
       }
+      refreshBackendData();
     } catch (err) {
       console.warn('Backend bookAppointment notice:', err);
     }
 
-    // 3. Notifications & analytics
     const patientNotif: AppNotification = {
       id: `notif-${Date.now()}-1`,
       userId: newApt.patientId,
@@ -862,13 +833,6 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     };
 
     setNotifications(prev => [patientNotif, doctorNotif, ...prev]);
-
-    setVisitAnalytics(prev => ({
-      ...prev,
-      totalPatientsToday: prev.totalPatientsToday + 1,
-      newPatientsCount: prev.newPatientsCount + 1
-    }));
-
     return newApt;
   };
 
@@ -877,6 +841,7 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     try {
       await api.updateAppointmentStatus(idOrBookingRef, status);
+      refreshBackendData();
     } catch (err) {
       console.warn('api.updateAppointmentStatus notice:', err);
     }
@@ -890,10 +855,8 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       prescriptionNumber
     };
 
-    // 1. Optimistic UI update
     setPrescriptions(prev => [newPrescription, ...prev]);
 
-    // 2. Persist to Supabase PostgreSQL database
     try {
       const saved = await api.addPrescription({
         prescription_number: prescriptionNumber,
@@ -922,21 +885,10 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       if (saved) {
         setPrescriptions(prev => prev.map(p => p.prescriptionNumber === prescriptionNumber ? { ...p, ...saved } : p));
       }
+      refreshBackendData();
     } catch (err) {
       console.warn('Backend addPrescription notice:', err);
     }
-
-    const rxNotif: AppNotification = {
-      id: `notif-${Date.now()}`,
-      userId: newPrescription.patientId,
-      type: 'medicine',
-      title: 'New Prescription Issued',
-      message: `${newPrescription.doctorName} has issued a new prescription (${prescriptionNumber}) with ${newPrescription.medicines.length} medications.`,
-      date: new Date().toISOString(),
-      isRead: false,
-      link: 'prescriptions'
-    };
-    setNotifications(prev => [rxNotif, ...prev]);
 
     return newPrescription;
   };
@@ -974,29 +926,39 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         is_abnormal: newReport.isAbnormal,
         file_url: '#'
       });
+      refreshBackendData();
     } catch (err) {
       console.warn('Backend addLabReport notice:', err);
     }
-
-    const labNotif: AppNotification = {
-      id: `notif-${Date.now()}`,
-      userId: newReport.patientId,
-      type: 'lab_report',
-      title: 'Laboratory Report Available',
-      message: `Your test report for "${newReport.testName}" is now ${newReport.reportStatus} for review.`,
-      date: new Date().toISOString(),
-      isRead: false,
-      link: 'history'
-    };
-    setNotifications(prev => [labNotif, ...prev]);
 
     return newReport;
   };
 
   const addStaff = async (memberData: Omit<StaffMember, 'id' | 'createdAt'>): Promise<StaffMember> => {
+    let profilePhoto = memberData.profilePhoto || '';
+    if (profilePhoto.startsWith('data:image')) {
+      try {
+        const uploadRes = await api.uploadImage(profilePhoto);
+        if (uploadRes && uploadRes.url) {
+          profilePhoto = uploadRes.url;
+        }
+      } catch (err) {
+        console.warn('Image upload error in addStaff:', err);
+      }
+    }
+
+    const staffId = memberData.staffId || (
+      memberData.type === 'doctor' ? `DOC-KLP-${Math.floor(100 + Math.random() * 900)}` :
+      memberData.type === 'receptionist' ? `REC-KLP-0${staff.filter(s => s.type === 'receptionist' || s.staffType === 'receptionist').length + 1}` :
+      memberData.type === 'technician' ? `TECH-KLP-0${staff.filter(s => s.type === 'technician' || s.staffType === 'technician').length + 1}` :
+      `STF-${Date.now().toString().slice(-4)}`
+    );
+
     const newStaff: StaffMember = {
       ...memberData,
       id: `stf-${Date.now()}`,
+      staffId,
+      profilePhoto,
       createdAt: new Date().toISOString().split('T')[0]
     };
 
@@ -1008,9 +970,9 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       fullName: memberData.name || memberData.fullName || 'Staff Member',
       mobile: memberData.mobile,
       email: memberData.email || '',
-      staffId: memberData.staffId,
-      doctorId: memberData.type === 'doctor' ? memberData.staffId : undefined,
-      patientId: memberData.type === 'patient' ? memberData.staffId : undefined,
+      staffId,
+      doctorId: memberData.type === 'doctor' ? staffId : undefined,
+      patientId: memberData.type === 'patient' ? staffId : undefined,
       department: memberData.department,
       specialization: memberData.roleTitle || memberData.specialization,
       qualification: memberData.qualification,
@@ -1024,16 +986,16 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       bloodGroup: memberData.bloodGroup,
       address: memberData.address,
       emergencyContact: memberData.emergencyContact,
-      profilePhoto: memberData.profilePhoto,
+      profilePhoto,
       createdAt: new Date().toISOString().split('T')[0]
     };
 
     setUsers(prev => [newUser, ...prev]);
 
     try {
-      await api.addStaff({
+      const savedStaff = await api.addStaff({
         staff_type: memberData.type || memberData.staffType || 'doctor',
-        staff_id: memberData.staffId,
+        staff_id: staffId,
         full_name: memberData.name || memberData.fullName,
         mobile: memberData.mobile,
         email: memberData.email,
@@ -1045,8 +1007,12 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         availability: memberData.availableDays,
         shift_timing: memberData.shiftTiming,
         working_hours: memberData.workingHours,
-        profile_photo: memberData.profilePhoto
+        profile_photo: profilePhoto
       });
+      if (savedStaff) {
+        setStaff(prev => prev.map(s => s.staffId === staffId ? { ...s, ...savedStaff } : s));
+      }
+      refreshBackendData();
     } catch (err) {
       console.warn('Backend addStaff notice:', err);
     }
@@ -1059,6 +1025,18 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const staffIdToUpdate = target ? (target.staffId || target.id) : idOrStaffId;
     const targetName = target ? (target.fullName || target.name) : '';
 
+    let updatedPhoto = updates.profilePhoto;
+    if (updatedPhoto && updatedPhoto.startsWith('data:image')) {
+      try {
+        const uploadRes = await api.uploadImage(updatedPhoto);
+        if (uploadRes && uploadRes.url) {
+          updatedPhoto = uploadRes.url;
+        }
+      } catch (err) {
+        console.warn('Image upload error in updateStaff:', err);
+      }
+    }
+
     const payload: any = {};
     if (updates.name !== undefined || updates.fullName !== undefined) payload.full_name = updates.name || updates.fullName;
     if (updates.mobile !== undefined) payload.mobile = updates.mobile;
@@ -1070,14 +1048,8 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     if (updates.availableDays !== undefined) payload.availability = updates.availableDays;
     if (updates.workingHours !== undefined) payload.working_hours = updates.workingHours;
     if (updates.shiftTiming !== undefined) payload.shift_timing = updates.shiftTiming;
-    if (updates.profilePhoto !== undefined) payload.profile_photo = updates.profilePhoto;
+    if (updatedPhoto !== undefined) payload.profile_photo = updatedPhoto;
     if (updates.isActive !== undefined) payload.is_active = updates.isActive;
-
-    try {
-      await api.updateStaff(staffIdToUpdate, payload);
-    } catch (err) {
-      console.warn('API updateStaff error:', err);
-    }
 
     setStaff(prev => {
       const updated = prev.map(s => {
@@ -1091,7 +1063,7 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             ...updates,
             name: updates.name || updates.fullName || s.name,
             fullName: updates.name || updates.fullName || s.fullName || s.name,
-            profilePhoto: updates.profilePhoto !== undefined ? updates.profilePhoto : s.profilePhoto
+            profilePhoto: updatedPhoto !== undefined ? updatedPhoto : s.profilePhoto
           };
         }
         return s;
@@ -1120,8 +1092,8 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             availableDays: updates.availableDays || u.availableDays,
             workingHours: updates.workingHours || u.workingHours,
             shiftTiming: updates.shiftTiming || u.shiftTiming,
-            profilePhoto: updates.profilePhoto !== undefined ? updates.profilePhoto : u.profilePhoto,
-            avatar: updates.profilePhoto !== undefined ? updates.profilePhoto : u.avatar,
+            profilePhoto: updatedPhoto !== undefined ? updatedPhoto : u.profilePhoto,
+            avatar: updatedPhoto !== undefined ? updatedPhoto : u.avatar,
             staffId: target?.staffId || u.staffId || staffIdToUpdate,
             doctorId: target?.staffId || u.doctorId || staffIdToUpdate
           };
@@ -1131,37 +1103,12 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       return updated;
     });
 
-    setCurrentUser(prev => {
-      if (!prev) return prev;
-      const isTarget = prev.id === idOrStaffId ||
-                       prev.staffId === staffIdToUpdate ||
-                       prev.doctorId === staffIdToUpdate ||
-                       prev.id === staffIdToUpdate ||
-                       prev.staffId === idOrStaffId ||
-                       (targetName && (prev.fullName === targetName)) ||
-                       (target?.mobile && prev.mobile === target.mobile);
-      if (isTarget) {
-        const updated = {
-          ...prev,
-          fullName: updates.name || updates.fullName || prev.fullName,
-          mobile: updates.mobile || prev.mobile,
-          email: updates.email || prev.email,
-          specialization: updates.specialization || updates.roleTitle || prev.specialization,
-          department: updates.department || prev.department,
-          qualification: updates.qualification || prev.qualification,
-          experience: updates.experience || prev.experience,
-          availableDays: updates.availableDays || prev.availableDays,
-          workingHours: updates.workingHours || prev.workingHours,
-          shiftTiming: updates.shiftTiming || prev.shiftTiming,
-          profilePhoto: updates.profilePhoto !== undefined ? updates.profilePhoto : prev.profilePhoto,
-          avatar: updates.profilePhoto !== undefined ? updates.profilePhoto : prev.avatar,
-          staffId: target?.staffId || prev.staffId || staffIdToUpdate,
-          doctorId: target?.staffId || prev.doctorId || staffIdToUpdate
-        };
-        return updated;
-      }
-      return prev;
-    });
+    try {
+      await api.updateStaff(staffIdToUpdate, payload);
+      refreshBackendData();
+    } catch (err) {
+      console.warn('API updateStaff error:', err);
+    }
   };
 
   const deleteStaff = async (idOrStaffId: string) => {
@@ -1179,15 +1126,6 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     try {
       localStorage.setItem(STORAGE_KEYS.DELETED_STAFF, JSON.stringify(Array.from(deleted)));
     } catch {}
-
-    try {
-      await api.deleteStaff(staffIdToDelete);
-      if (idOrStaffId !== staffIdToDelete) {
-        await api.deleteStaff(idOrStaffId);
-      }
-    } catch (err) {
-      console.warn('api.deleteStaff error:', err);
-    }
 
     setStaff(prev => {
       const updated = prev.filter(s => 
@@ -1226,6 +1164,16 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       if (isCurDeleted) {
         logout();
       }
+    }
+
+    try {
+      await api.deleteStaff(staffIdToDelete);
+      if (idOrStaffId !== staffIdToDelete) {
+        await api.deleteStaff(idOrStaffId);
+      }
+      refreshBackendData();
+    } catch (err) {
+      console.warn('api.deleteStaff error:', err);
     }
   };
 
@@ -1281,6 +1229,7 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         department: patientFormData.department,
         doctor: patientFormData.doctor
       });
+      refreshBackendData();
     } catch (err) {
       console.warn('Backend registerPatientReceptionist notice:', err);
     }
@@ -1331,14 +1280,26 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }));
   };
 
-  const updateHospitalInfo = (updates: Partial<Hospital>) => {
-    setHospital(prev => {
-      const updated = { ...prev, ...updates };
-      return updated;
-    });
+  const updateHospitalInfo = async (updates: Partial<Hospital>) => {
+    let logoUrl = updates.logo;
+    if (logoUrl && logoUrl.startsWith('data:image')) {
+      try {
+        const uploadRes = await api.uploadImage(logoUrl);
+        if (uploadRes && uploadRes.url) {
+          logoUrl = uploadRes.url;
+        }
+      } catch (err) {
+        console.warn('Logo upload notice:', err);
+      }
+    }
+
+    const payload = { ...updates, ...(logoUrl ? { logo: logoUrl } : {}) };
+
+    setHospital(prev => ({ ...prev, ...payload }));
 
     try {
-      api.updateHospital(updates);
+      await api.updateHospital(payload);
+      refreshBackendData();
     } catch (err) {
       console.warn('api.updateHospital error:', err);
     }

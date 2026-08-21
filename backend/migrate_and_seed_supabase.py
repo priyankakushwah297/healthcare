@@ -101,7 +101,7 @@ def seed_supabase_database(c_urls):
     StaffMember.objects.update_or_create(
         staff_id='TECH-KLP-01',
         defaults={
-            'staff_type': 'doctor',
+            'staff_type': 'technician',
             'full_name': 'Karan Malhotra',
             'mobile': '9876543260',
             'email': 'tech.karan@healthcare.com',
@@ -236,7 +236,7 @@ def seed_supabase_database(c_urls):
         StaffMember.objects.update_or_create(
             staff_id=r['id'],
             defaults={
-                'staff_type': 'doctor',
+                'staff_type': 'receptionist',
                 'full_name': r['name'],
                 'mobile': r['mobile'],
                 'email': r['email'],

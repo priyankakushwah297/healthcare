@@ -1,4 +1,5 @@
 import random
+import os
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -8,6 +9,30 @@ from .serializers import (
     HospitalSerializer, UserProfileSerializer, StaffMemberSerializer,
     AppointmentSerializer, PrescriptionSerializer, LabReportSerializer
 )
+
+# ---------------- CLOUDINARY MEDIA HELPER ----------------
+
+def save_image_to_cloudinary_if_base64(image_val, folder='healthcare_uploads'):
+    """
+    If image_val is a base64 string, upload to Cloudinary and return the CDN secure URL.
+    If it is already an HTTP/HTTPS URL, return it directly.
+    """
+    if not image_val:
+        return image_val
+    if isinstance(image_val, str) and (image_val.startswith('data:image/') or (len(image_val) > 400 and ';base64,' in image_val)):
+        try:
+            import cloudinary.uploader
+            res = cloudinary.uploader.upload(
+                image_val,
+                folder=folder,
+                resource_type='image'
+            )
+            return res.get('secure_url') or res.get('url') or image_val
+        except Exception as e:
+            print(f"Cloudinary auto-upload exception: {e}")
+            return image_val
+    return image_val
+
 
 # ---------------- AUTHENTICATION VIEWS ----------------
 
@@ -23,7 +48,6 @@ def check_phone(request):
     ).first()
     
     if not user:
-        # Also check staff member table
         staff = StaffMember.objects.filter(
             Q(mobile=mobile_number) | Q(mobile__endswith=clean_mob[-10:] if len(clean_mob) >= 10 else clean_mob)
         ).first()
@@ -76,7 +100,6 @@ def verify_otp(request):
     
     clean_mob = ''.join(filter(str.isdigit, mobile_number))
     
-    # Allow test OTP 123456 or 1234
     if otp_code in ['123456', '1234']:
         user = UserProfile.objects.filter(
             Q(mobile_number=mobile_number) | Q(mobile_number__endswith=clean_mob[-10:] if len(clean_mob) >= 10 else clean_mob)
@@ -120,6 +143,9 @@ def register_user(request):
     count = UserProfile.objects.filter(role=role).count() + 101
     user_id = data.get('user_id') or data.get('id') or f"{prefix}-{count}"
     
+    avatar_val = data.get('profile_photo') or data.get('avatar', '')
+    avatar_val = save_image_to_cloudinary_if_base64(avatar_val, folder='healthcare_avatars')
+
     user, created = UserProfile.objects.update_or_create(
         user_id=user_id,
         defaults={
@@ -130,7 +156,7 @@ def register_user(request):
             'age': data.get('age') or data.get('dobOrAge', ''),
             'gender': data.get('gender', 'Male'),
             'role': role,
-            'blood_group': data.get('blood_group') or data.get('bloodGroup', ''),
+            'blood_group': data.get('blood_group') or data.get('bloodGroup', 'O+'),
             'address': data.get('address', ''),
             'emergency_contact': data.get('emergency_contact') or data.get('emergencyContact', ''),
             'specialization': data.get('specialization', ''),
@@ -144,12 +170,12 @@ def register_user(request):
             'patient_id': data.get('patient_id') or (user_id if role == 'patient' else ''),
             'doctor_id': data.get('doctor_id') or (user_id if role == 'doctor' else ''),
             'staff_id': data.get('staff_id') or user_id,
-            'avatar': data.get('profile_photo') or data.get('avatar', '')
+            'avatar': avatar_val
         }
     )
     
-    # If doctor/receptionist/technician, keep StaffMember synchronized
-    if role in ['doctor', 'receptionist', 'technician']:
+    # Keep StaffMember synchronized for staff roles
+    if role in ['doctor', 'receptionist', 'technician', 'pharmacist', 'lab_technician']:
         StaffMember.objects.update_or_create(
             staff_id=user_id,
             defaults={
@@ -165,7 +191,7 @@ def register_user(request):
                 'availability': data.get('availability', 'Mon - Sat'),
                 'shift_timing': data.get('shift_timing') or data.get('shiftTiming', '09:00 AM - 05:00 PM'),
                 'working_hours': data.get('working_hours') or data.get('workingHours', '8 Hours / Day'),
-                'profile_photo': data.get('profile_photo') or data.get('avatar', '')
+                'profile_photo': avatar_val
             }
         )
     
@@ -177,14 +203,14 @@ def register_user(request):
 @api_view(['GET'])
 def user_list(request):
     role = request.query_params.get('role')
-    queryset = UserProfile.objects.all().order_by('-created_at')
+    queryset = UserProfile.objects.all().order_by('-id')
     if role:
         queryset = queryset.filter(role=role)
     return Response(UserProfileSerializer(queryset, many=True).data)
 
 @api_view(['GET'])
 def patient_list(request):
-    patients = UserProfile.objects.filter(role='patient').order_by('-created_at')
+    patients = UserProfile.objects.filter(role='patient').order_by('-id')
     return Response(UserProfileSerializer(patients, many=True).data)
 
 
@@ -201,9 +227,11 @@ def hospital_list_create(request):
     
     elif request.method in ['POST', 'PUT']:
         data = request.data
-        for field in ['name', 'phone', 'emergency_phone', 'email', 'address', 'tagline', 'logo', 'total_beds', 'occupied_beds', 'icu_beds', 'ambulances', 'departments']:
+        for field in ['name', 'phone', 'emergency_phone', 'email', 'address', 'tagline', 'total_beds', 'occupied_beds', 'icu_beds', 'ambulances', 'departments']:
             if field in data:
                 setattr(hosp, field, data[field])
+        if 'logo' in data and data['logo']:
+            hosp.logo = save_image_to_cloudinary_if_base64(data['logo'], folder='healthcare_branding')
         hosp.save()
         return Response(HospitalSerializer(hosp).data)
 
@@ -242,14 +270,29 @@ def staff_list_create(request):
     
     elif request.method == 'POST':
         data = request.data
-        staff_type = data.get('staff_type') or data.get('type', 'doctor')
+        staff_type = data.get('staff_type') or data.get('staffType') or data.get('type', 'doctor')
         
-        prefix_map = {'doctor': 'DOC-KLP', 'patient': 'PAT', 'receptionist': 'REC-KLP', 'technician': 'TECH-KLP', 'pharmacy': 'PHARM', 'lab': 'LAB'}
+        prefix_map = {
+            'doctor': 'DOC-KLP',
+            'patient': 'PAT',
+            'receptionist': 'REC-KLP',
+            'technician': 'TECH-KLP',
+            'pharmacy': 'PHARM',
+            'lab': 'LAB'
+        }
         prefix = prefix_map.get(staff_type, 'STF')
         count = StaffMember.objects.filter(staff_type=staff_type).count() + 101
         staff_id = data.get('staff_id') or data.get('staffId') or f"{prefix}-{count}"
         full_name = data.get('full_name') or data.get('fullName') or data.get('name', '')
         
+        # Upload profile photo to Cloudinary if base64 data URL
+        raw_photo = data.get('profile_photo') or data.get('profilePhoto', '')
+        photo_url = save_image_to_cloudinary_if_base64(raw_photo, folder='healthcare_avatars')
+        
+        avail = data.get('availability') or data.get('availableDays', 'Mon - Sat')
+        if isinstance(avail, list):
+            avail = ', '.join(avail)
+
         staff_member, created = StaffMember.objects.update_or_create(
             staff_id=staff_id,
             defaults={
@@ -262,7 +305,7 @@ def staff_list_create(request):
                 'qualification': data.get('qualification', ''),
                 'experience': data.get('experience', ''),
                 'consultation_fee': str(data.get('consultation_fee') or data.get('consultationFee', '700')),
-                'availability': str(data.get('availability') or data.get('availableDays', 'Mon - Sat')),
+                'availability': str(avail),
                 'shift_timing': data.get('shift_timing') or data.get('shiftTiming', '09:00 AM - 05:00 PM'),
                 'working_hours': data.get('working_hours') or data.get('workingHours', '8 Hours / Day'),
                 'dob': data.get('dob') or data.get('dobOrAge', ''),
@@ -273,7 +316,8 @@ def staff_list_create(request):
                 'pharmacy_role': data.get('pharmacy_role', ''),
                 'lab_department': data.get('lab_department', ''),
                 'lab_role': data.get('lab_role', ''),
-                'profile_photo': data.get('profile_photo') or data.get('profilePhoto', ''),
+                'profile_photo': photo_url,
+                'is_active': data.get('is_active', True)
             }
         )
         
@@ -290,11 +334,12 @@ def staff_list_create(request):
                 'qualification': data.get('qualification', ''),
                 'experience': data.get('experience', ''),
                 'consultation_fee': str(data.get('consultation_fee') or data.get('consultationFee', '700')),
+                'availability': str(avail),
                 'shift_timing': data.get('shift_timing') or data.get('shiftTiming', '09:00 AM - 05:00 PM'),
                 'working_hours': data.get('working_hours') or data.get('workingHours', '8 Hours / Day'),
                 'staff_id': staff_id,
                 'doctor_id': staff_id if staff_type == 'doctor' else '',
-                'avatar': data.get('profile_photo') or data.get('profilePhoto', '')
+                'avatar': photo_url
             }
         )
             
@@ -312,7 +357,7 @@ def staff_detail(request, staff_id):
 
     if not staff_member:
         if request.method == 'DELETE':
-            UserProfile.objects.filter(user_id=staff_id).delete()
+            UserProfile.objects.filter(Q(user_id=staff_id) | Q(staff_id=staff_id) | Q(doctor_id=staff_id)).delete()
             return Response({'success': True, 'message': 'Staff profile removed from database.'})
         return Response({'error': 'Staff member not found'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -344,6 +389,8 @@ def staff_detail(request, staff_id):
                         val = str(val)
                     if model_field == 'availability' and isinstance(val, list):
                         val = ', '.join(val)
+                    if model_field == 'profile_photo':
+                        val = save_image_to_cloudinary_if_base64(val, folder='healthcare_avatars')
                     setattr(staff_member, model_field, val)
                     break
         staff_member.save()
@@ -359,6 +406,7 @@ def staff_detail(request, staff_id):
             consultation_fee=staff_member.consultation_fee,
             working_hours=staff_member.working_hours,
             shift_timing=staff_member.shift_timing,
+            availability=staff_member.availability,
             avatar=staff_member.profile_photo
         )
         return Response(StaffMemberSerializer(staff_member).data)
@@ -366,7 +414,7 @@ def staff_detail(request, staff_id):
     elif request.method == 'DELETE':
         actual_staff_id = staff_member.staff_id
         staff_member.delete()
-        UserProfile.objects.filter(user_id=actual_staff_id).delete()
+        UserProfile.objects.filter(Q(user_id=actual_staff_id) | Q(staff_id=actual_staff_id) | Q(doctor_id=actual_staff_id)).delete()
         return Response({'success': True, 'message': 'Staff profile deleted permanently from database.'})
 
 
@@ -393,7 +441,6 @@ def appointment_list_create(request):
             ref_count = Appointment.objects.count() + 1001
             booking_ref = f"KLP-APT-{ref_count}"
             
-        # Ensure patient name & mobile are clean
         patient_name = data.get('patient_name') or data.get('patientName', 'Patient')
         patient_phone = data.get('patient_phone') or data.get('patientMobile', '')
         doctor_id = data.get('doctor_id') or data.get('doctorId', 'DOC-KLP-101')
@@ -428,7 +475,7 @@ def appointment_list_create(request):
 @api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
 def appointment_detail_update(request, booking_ref_or_pk):
     appointment = Appointment.objects.filter(
-        Q(booking_ref=booking_ref_or_pk) | Q(pk=int(booking_ref_or_pk) if booking_ref_or_pk.isdigit() else -1)
+        Q(booking_ref=booking_ref_or_pk) | Q(pk=int(booking_ref_or_pk) if str(booking_ref_or_pk).isdigit() else -1)
     ).first()
     
     if not appointment:
@@ -552,6 +599,9 @@ def lab_report_list_create(request):
         if not r_num:
             r_num = f"LAB-KLP-2026-{LabReport.objects.count() + 501}"
             
+        file_val = data.get('file_url') or data.get('fileUrl', '#')
+        file_url = save_image_to_cloudinary_if_base64(file_val, folder='healthcare_reports')
+
         report, created = LabReport.objects.update_or_create(
             report_number=r_num,
             defaults={
@@ -569,7 +619,7 @@ def lab_report_list_create(request):
                 'units': data.get('units', ''),
                 'findings': data.get('findings', ''),
                 'is_abnormal': bool(data.get('is_abnormal') or data.get('isAbnormal', False)),
-                'file_url': data.get('file_url') or data.get('fileUrl', '#')
+                'file_url': file_url
             }
         )
         return Response(LabReportSerializer(report).data, status=status.HTTP_201_CREATED)

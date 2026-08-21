@@ -115,7 +115,7 @@ export const PatientBookAppointment: React.FC<{ hideTabs?: boolean }> = ({ hideT
         consultationFee: s.consultationFee || matchingUser?.consultationFee || 750,
         workingHours: s.workingHours || s.shiftTiming || matchingUser?.workingHours || '09:00 AM - 04:00 PM',
         availableDays: s.availableDays || matchingUser?.availableDays,
-        profilePhoto: s.profilePhoto || matchingUser?.profilePhoto || (matchingUser as any)?.avatar || 'https://images.unsplash.com/photo-1594824813570-87b64010b991?w=250&auto=format&fit=crop&q=80',
+        profilePhoto: s.profilePhoto || matchingUser?.profilePhoto || (matchingUser as any)?.avatar || 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224296/healthcare_avatars/avatar_doctor_1.jpg',
         role: 'doctor'
       });
     });
@@ -142,7 +142,7 @@ export const PatientBookAppointment: React.FC<{ hideTabs?: boolean }> = ({ hideT
           consultationFee: u.consultationFee || 750,
           workingHours: u.workingHours || '09:00 AM - 04:00 PM',
           availableDays: u.availableDays,
-          profilePhoto: u.profilePhoto || (u as any)?.avatar || 'https://images.unsplash.com/photo-1594824813570-87b64010b991?w=250&auto=format&fit=crop&q=80',
+          profilePhoto: u.profilePhoto || (u as any)?.avatar || 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224296/healthcare_avatars/avatar_doctor_1.jpg',
           role: 'doctor'
         });
       }
@@ -497,8 +497,8 @@ INSTRUCTIONS FOR PATIENT:
                           referrerPolicy="no-referrer"
                           onError={(e) => {
                             (e.target as HTMLImageElement).src = selectedDoctor.gender === 'Female' 
-                              ? 'https://images.unsplash.com/photo-1594824813570-87b64010b991?w=250&auto=format&fit=crop&q=80'
-                              : 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=250&auto=format&fit=crop&q=80';
+                              ? 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224342/healthcare_avatars/avatar_doctor_2.jpg'
+                              : 'https://res.cloudinary.com/agyzxqvk/image/upload/v1787224296/healthcare_avatars/avatar_doctor_1.jpg';
                           }}
                         />
                       ) : (
