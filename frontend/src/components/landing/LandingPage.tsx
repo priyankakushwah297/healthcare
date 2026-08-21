@@ -20,6 +20,7 @@ import {
   Building
 } from 'lucide-react';
 import { useHospital } from '../../context/HospitalContext';
+import heroBg from '../../assets/hero-medical-bg.jpg';
 
 export const LandingPage: React.FC = () => {
   const { currentUser, openAuthModal, openBookModal, setActiveTab, staff, hospital } = useHospital();
@@ -35,87 +36,113 @@ export const LandingPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-20 sm:space-y-24 animate-fadeIn font-sans bg-[#F7FAFC] text-[#1E293B] pb-12">
+    <div className="space-y-20 sm:space-y-24 animate-fadeIn font-sans text-[#1E293B] pb-16">
       
-      {/* HERO SECTION - Premium Serene Light Blue Medical Aesthetic */}
-      <section id="home" className="scroll-mt-24 pt-2 pb-2">
-        <div className="relative rounded-3xl p-8 sm:p-12 text-[#0C2B4E] shadow-[0_12px_40px_-10px_rgba(2,132,199,0.12)] border border-sky-200/80 bg-gradient-to-br from-[#E0F2FE] via-[#F0F9FF] to-[#E6F4FE] overflow-hidden space-y-8">
-          
-          {/* Subtle Ambient Light Blue Glow Flares */}
+      {/* HERO SECTION */}
+      <section id="home" className="relative scroll-mt-24 pt-2 pb-2">
+        <div className="relative rounded-3xl p-8 sm:p-12 text-[#0C2B4E] shadow-[0_12px_40px_-10px_rgba(2,132,199,0.12)] border border-sky-200/80 bg-gradient-to-br from-[#E0F2FE] via-[#F0F9FF] to-[#E6F4FE] overflow-hidden">
+
+          {/* Glow Flares */}
           <div className="absolute -top-24 -right-24 w-96 h-96 bg-sky-400/20 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-teal-400/15 rounded-full blur-3xl pointer-events-none" />
 
-          {/* Top Pill Badge */}
-          <div className="relative z-10">
-            <div className="inline-flex items-center space-x-2 bg-white/90 text-[#0284C7] px-4 py-1.5 rounded-full text-xs font-bold border border-sky-300/80 shadow-2xs backdrop-blur-md">
-              <ShieldCheck className="w-4 h-4 text-[#0284C7]" />
-              <span>NABH & JCI Accredited Super-Speciality Medical Care</span>
+          {/* Two-column layout: Left content + Right doctor image */}
+          <div className="relative z-10 flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+
+            {/* LEFT COLUMN – All text content & buttons */}
+            <div className="flex-1 space-y-8 min-w-0">
+
+              {/* NABH Badge */}
+              <div>
+                <div className="inline-flex items-center space-x-2 bg-white/90 text-[#0284C7] px-4 py-1.5 rounded-full text-xs font-bold border border-sky-300/80 shadow-2xs backdrop-blur-md">
+                  <ShieldCheck className="w-4 h-4 text-[#0284C7]" />
+                  <span>NABH &amp; JCI Accredited Super-Speciality Medical Care</span>
+                </div>
+              </div>
+
+              {/* Heading */}
+              <div className="space-y-4 max-w-2xl">
+                <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-[#0C2B4E] tracking-tight leading-[1.15]">
+                  Healthcare crafted with{' '}
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#0284C7] via-[#0D9488] to-[#2563EB]">
+                    precision &amp; empathy.
+                  </span>
+                </h1>
+                <p className="text-sm sm:text-base text-[#334E68] leading-relaxed max-w-2xl font-medium">
+                  Welcome to {hospital.name || 'Healthcare Center'}. World-class clinical diagnostics, distinguished specialists, and compassionate 24/7 patient support designed seamlessly around your health.
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap items-center gap-4 pt-2">
+                <button
+                  id="hero-book-appointment-btn"
+                  onClick={handleConsultationClick}
+                  className="apple-btn-primary px-6 py-3.5 rounded-xl text-sm font-semibold shadow-md shadow-sky-500/25 flex items-center space-x-2 cursor-pointer active:scale-[0.98]"
+                >
+                  <Calendar className="w-4 h-4 text-[#38BDF8]" />
+                  <span>Book Appointment</span>
+                </button>
+
+                <button
+                  id="hero-patient-login-btn"
+                  onClick={() => openAuthModal()}
+                  className="bg-white hover:bg-sky-50/80 text-[#0C2B4E] border border-sky-200 shadow-2xs hover:shadow-xs px-6 py-3.5 rounded-xl text-sm font-semibold transition-all backdrop-blur-md flex items-center space-x-2 cursor-pointer active:scale-[0.98]"
+                >
+                  <User className="w-4 h-4 text-[#0284C7]" />
+                  <span>Patient Portal</span>
+                </button>
+
+                <a
+                  href="tel:102"
+                  className="bg-rose-50 hover:bg-rose-100/80 text-rose-700 border border-rose-200 px-5 py-3.5 rounded-xl text-sm font-semibold transition-all flex items-center space-x-2 cursor-pointer active:scale-[0.98] shadow-2xs"
+                >
+                  <PhoneCall className="w-4 h-4 text-rose-600" />
+                  <span>24/7 Emergency: +91 98765 43211 / 102</span>
+                </a>
+              </div>
+
+              {/* Stats Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-8 border-t border-sky-200/80">
+                <div className="p-4 bg-white/80 hover:bg-white rounded-2xl border border-sky-100 shadow-xs transition-all duration-300 backdrop-blur-md">
+                  <p className="text-2xl sm:text-3xl font-extrabold text-[#0C2B4E] tracking-tight">350+</p>
+                  <p className="text-xs text-[#486581] font-semibold mt-1">Smart Inpatient Beds</p>
+                </div>
+                <div className="p-4 bg-white/80 hover:bg-white rounded-2xl border border-sky-100 shadow-xs transition-all duration-300 backdrop-blur-md">
+                  <p className="text-2xl sm:text-3xl font-extrabold text-[#0C2B4E] tracking-tight">45+</p>
+                  <p className="text-xs text-[#486581] font-semibold mt-1">Senior Specialists</p>
+                </div>
+                <div className="p-4 bg-white/80 hover:bg-white rounded-2xl border border-sky-100 shadow-xs transition-all duration-300 backdrop-blur-md">
+                  <p className="text-2xl sm:text-3xl font-extrabold text-[#0D9488] tracking-tight">99.4%</p>
+                  <p className="text-xs text-[#486581] font-semibold mt-1">Clinical Satisfaction</p>
+                </div>
+                <div className="p-4 bg-white/80 hover:bg-white rounded-2xl border border-sky-100 shadow-xs transition-all duration-300 backdrop-blur-md">
+                  <p className="text-2xl sm:text-3xl font-extrabold text-[#0284C7] tracking-tight">24/7</p>
+                  <p className="text-xs text-[#486581] font-semibold mt-1">Trauma &amp; ICU Support</p>
+                </div>
+              </div>
+
             </div>
+            {/* RIGHT COLUMN – Doctor Image */}
+            <div className="hidden lg:block absolute top-0 right-0 h-full w-[420px] xl:w-[480px] pointer-events-none">
+              {/* Glow ring behind image */}
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-sky-400/30 via-blue-400/20 to-teal-400/25 blur-2xl scale-105 pointer-events-none" />
+              <img
+                src="/hero-doctor.jpg"
+                alt="Doctor holding digital globe"
+                className="relative z-10 w-full h-full object-cover object-top rounded-r-3xl shadow-[0_20px_60px_-15px_rgba(2,132,199,0.4)]"
+              />
+              {/* Floating badge on image */}
+              <div className="absolute bottom-8 left-5 z-20 bg-white/95 backdrop-blur-md rounded-xl px-4 py-2.5 shadow-lg border border-sky-200 flex items-center gap-2 pointer-events-auto">
+                <Activity className="w-4 h-4 text-[#0D9488]" />
+                <div>
+                  <p className="text-xs font-extrabold text-[#0C2B4E]">AI-Powered Care</p>
+                  <p className="text-[10px] text-[#486581] font-medium">Smart Diagnostics &amp; EHR</p>
+                </div>
+              </div>
+            </div>
+
           </div>
-
-          {/* Main Hero Heading & Subtitle */}
-          <div className="relative z-10 space-y-4 max-w-3xl">
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-[#0C2B4E] tracking-tight leading-[1.15]">
-              Healthcare crafted with{' '}
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#0284C7] via-[#0D9488] to-[#2563EB]">
-                precision &amp; empathy.
-              </span>
-            </h1>
-
-            <p className="text-sm sm:text-base text-[#334E68] leading-relaxed max-w-2xl font-medium">
-              Welcome to {hospital.name || 'Healthcare Center'}. World-class clinical diagnostics, distinguished specialists, and compassionate 24/7 patient support designed seamlessly around your health.
-            </p>
-          </div>
-
-          {/* 3 Action Buttons */}
-          <div className="relative z-10 flex flex-wrap items-center gap-4 pt-2">
-            <button
-              id="hero-book-appointment-btn"
-              onClick={handleConsultationClick}
-              className="apple-btn-primary px-6 py-3.5 rounded-xl text-sm font-semibold shadow-md shadow-sky-500/25 flex items-center space-x-2 cursor-pointer active:scale-[0.98]"
-            >
-              <Calendar className="w-4 h-4 text-[#38BDF8]" />
-              <span>Book Appointment</span>
-            </button>
-
-            <button
-              id="hero-patient-login-btn"
-              onClick={() => openAuthModal()}
-              className="bg-white hover:bg-sky-50/80 text-[#0C2B4E] border border-sky-200 shadow-2xs hover:shadow-xs px-6 py-3.5 rounded-xl text-sm font-semibold transition-all backdrop-blur-md flex items-center space-x-2 cursor-pointer active:scale-[0.98]"
-            >
-              <User className="w-4 h-4 text-[#0284C7]" />
-              <span>Patient Portal</span>
-            </button>
-
-            <a
-              href="tel:102"
-              className="bg-rose-50 hover:bg-rose-100/80 text-rose-700 border border-rose-200 px-5 py-3.5 rounded-xl text-sm font-semibold transition-all flex items-center space-x-2 cursor-pointer active:scale-[0.98] shadow-2xs"
-            >
-              <PhoneCall className="w-4 h-4 text-rose-600" />
-              <span>24/7 Emergency: +91 98765 43211 / 102</span>
-            </a>
-          </div>
-
-          {/* Bottom 4 Stat Counters */}
-          <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-4 pt-8 border-t border-sky-200/80">
-            <div className="p-4 bg-white/80 hover:bg-white rounded-2xl border border-sky-100 shadow-xs transition-all duration-300 backdrop-blur-md">
-              <p className="text-2xl sm:text-3xl font-extrabold text-[#0C2B4E] tracking-tight">350+</p>
-              <p className="text-xs text-[#486581] font-semibold mt-1">Smart Inpatient Beds</p>
-            </div>
-            <div className="p-4 bg-white/80 hover:bg-white rounded-2xl border border-sky-100 shadow-xs transition-all duration-300 backdrop-blur-md">
-              <p className="text-2xl sm:text-3xl font-extrabold text-[#0C2B4E] tracking-tight">45+</p>
-              <p className="text-xs text-[#486581] font-semibold mt-1">Senior Specialists</p>
-            </div>
-            <div className="p-4 bg-white/80 hover:bg-white rounded-2xl border border-sky-100 shadow-xs transition-all duration-300 backdrop-blur-md">
-              <p className="text-2xl sm:text-3xl font-extrabold text-[#0D9488] tracking-tight">99.4%</p>
-              <p className="text-xs text-[#486581] font-semibold mt-1">Clinical Satisfaction</p>
-            </div>
-            <div className="p-4 bg-white/80 hover:bg-white rounded-2xl border border-sky-100 shadow-xs transition-all duration-300 backdrop-blur-md">
-              <p className="text-2xl sm:text-3xl font-extrabold text-[#0284C7] tracking-tight">24/7</p>
-              <p className="text-xs text-[#486581] font-semibold mt-1">Trauma &amp; ICU Support</p>
-            </div>
-          </div>
-
         </div>
       </section>
 
