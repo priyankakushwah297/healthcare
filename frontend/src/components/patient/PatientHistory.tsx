@@ -75,6 +75,89 @@ export const PatientHistory: React.FC<{ hideTabs?: boolean }> = ({ hideTabs }) =
     m => m.patientId === currentUser?.id || m.patientId === 'usr-patient-1'
   );
 
+  // Helper to safely parse lab results (strings or arrays) into structured parameter rows
+  const parseLabReportResults = (lr: LabReport) => {
+    const resultsData = lr.results;
+    if (!resultsData) {
+      return [{
+        parameter: lr.testName || 'Diagnostic Test Evaluation',
+        result: 'Completed / Normal',
+        unit: lr.units || '-',
+        normalRange: lr.normalRange || 'Standard Normal Reference',
+        flag: lr.isAbnormal ? 'Abnormal' : 'Normal'
+      }];
+    }
+
+    if (Array.isArray(resultsData)) {
+      return (resultsData as any[]).map((r: any) => ({
+        parameter: r.parameter || r.name || r.test || 'Parameter',
+        result: r.result || r.value || '-',
+        unit: r.unit || lr.units || '-',
+        normalRange: r.normalRange || r.range || lr.normalRange || 'Standard',
+        flag: r.flag || r.status || (lr.isAbnormal ? 'Abnormal' : 'Normal')
+      }));
+    }
+
+    if (typeof resultsData === 'string') {
+      if (resultsData.includes('|') || resultsData.includes(';')) {
+        const parts = resultsData.split(/[|;]/).map(p => p.trim()).filter(Boolean);
+        return parts.map(part => {
+          const colonIdx = part.indexOf(':');
+          if (colonIdx !== -1) {
+            const paramName = part.substring(0, colonIdx).trim();
+            const paramVal = part.substring(colonIdx + 1).trim();
+
+            let refRange = lr.normalRange || 'Standard Reference';
+            let unit = lr.units || '';
+            const lowerParam = paramName.toLowerCase();
+            if (lowerParam.includes('total cholesterol')) refRange = '< 200 mg/dL';
+            else if (lowerParam.includes('hdl')) refRange = '> 40 mg/dL';
+            else if (lowerParam.includes('ldl')) refRange = '< 100 mg/dL';
+            else if (lowerParam.includes('triglycerides')) refRange = '< 150 mg/dL';
+            else if (lowerParam.includes('hba1c')) refRange = '< 5.7% (Non-diabetic)';
+            else if (lowerParam.includes('fasting')) refRange = '70 - 99 mg/dL';
+            else if (lowerParam.includes('postprandial')) refRange = '< 140 mg/dL';
+            else if (lowerParam.includes('hemoglobin')) refRange = '12.0 - 15.5 g/dL';
+            else if (lowerParam.includes('wbc')) refRange = '4,500 - 11,000 /mcL';
+            else if (lowerParam.includes('platelets')) refRange = '1.5 - 4.5 Lakhs/mcL';
+            else if (lowerParam.includes('esr')) refRange = '0 - 15 mm/hr';
+
+            return {
+              parameter: paramName,
+              result: paramVal,
+              unit: unit || '-',
+              normalRange: refRange,
+              flag: lr.isAbnormal ? 'Abnormal' : 'Normal'
+            };
+          }
+          return {
+            parameter: part,
+            result: 'Observed / Present',
+            unit: lr.units || '-',
+            normalRange: lr.normalRange || 'Standard Reference',
+            flag: lr.isAbnormal ? 'Abnormal' : 'Normal'
+          };
+        });
+      }
+
+      return [{
+        parameter: lr.testName || 'Diagnostic Evaluation',
+        result: resultsData,
+        unit: lr.units || '-',
+        normalRange: lr.normalRange || 'Standard Normal Reference',
+        flag: lr.isAbnormal ? 'Abnormal' : 'Normal'
+      }];
+    }
+
+    return [{
+      parameter: lr.testName || 'Diagnostic Evaluation',
+      result: String(resultsData),
+      unit: lr.units || '-',
+      normalRange: lr.normalRange || 'Standard',
+      flag: 'Normal'
+    }];
+  };
+
   const handleOpenPrescription = (rx: Prescription) => {
     setSelectedPrescription(rx);
     setModalType('prescription');
@@ -181,7 +264,7 @@ export const PatientHistory: React.FC<{ hideTabs?: boolean }> = ({ hideTabs }) =
             </div>
           ) : (
             myPrescriptions
-              .filter(p => !searchTerm || p.diagnosis.toLowerCase().includes(searchTerm.toLowerCase()) || p.doctorName.toLowerCase().includes(searchTerm.toLowerCase()) || p.medicines.some(m => m.name.toLowerCase().includes(searchTerm.toLowerCase())))
+              .filter(p => !searchTerm || p.diagnosis?.toLowerCase().includes(searchTerm.toLowerCase()) || p.doctorName?.toLowerCase().includes(searchTerm.toLowerCase()) || (p.medicines || []).some(m => m.name?.toLowerCase().includes(searchTerm.toLowerCase())))
               .map((rx) => (
                 <div
                   key={rx.id}
@@ -236,7 +319,7 @@ export const PatientHistory: React.FC<{ hideTabs?: boolean }> = ({ hideTabs }) =
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100">
-                        {rx.medicines.map((med, idx) => (
+                        {(rx.medicines || []).map((med, idx) => (
                           <tr key={idx} className="hover:bg-[#F7FAFC]">
                             <td className="py-2.5 px-3 font-bold text-[#123B5D]">{med.name}</td>
                             <td className="py-2.5 px-3 font-semibold text-[#159A9C]">{med.dosage}</td>
@@ -249,10 +332,10 @@ export const PatientHistory: React.FC<{ hideTabs?: boolean }> = ({ hideTabs }) =
                     </table>
                   </div>
 
-                  {rx.advice && (
+                  {(rx.adviceNotes || rx.advice) && (
                     <div className="p-3 bg-[#E8F6F6]/40 rounded-xl border border-[#159A9C]/20 text-xs text-[#123B5D]">
                       <strong className="text-[#159A9C]">Doctor's Clinical Advice: </strong>
-                      {rx.advice}
+                      {rx.adviceNotes || rx.advice}
                     </div>
                   )}
                 </div>
@@ -273,84 +356,87 @@ export const PatientHistory: React.FC<{ hideTabs?: boolean }> = ({ hideTabs }) =
             </div>
           ) : (
             myLabReports
-              .filter(l => !searchTerm || l.testName.toLowerCase().includes(searchTerm.toLowerCase()) || l.labDepartment.toLowerCase().includes(searchTerm.toLowerCase()))
-              .map((lr) => (
-                <div
-                  key={lr.id}
-                  className="bg-white rounded-2xl p-5 border border-[#E2E8F0] shadow-xs space-y-4 hover:border-emerald-400 transition-colors"
-                >
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[#E2E8F0] gap-2">
-                    <div>
-                      <div className="flex items-center space-x-2">
-                        <span className="font-mono text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full">
-                          {lr.reportNumber}
-                        </span>
-                        <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full uppercase">
-                          {lr.reportStatus}
-                        </span>
+              .filter(l => !searchTerm || l.testName?.toLowerCase().includes(searchTerm.toLowerCase()) || l.labDepartment?.toLowerCase().includes(searchTerm.toLowerCase()) || l.reportNumber?.toLowerCase().includes(searchTerm.toLowerCase()))
+              .map((lr) => {
+                const parsedResults = parseLabReportResults(lr);
+                return (
+                  <div
+                    key={lr.id}
+                    className="bg-white rounded-2xl p-5 border border-[#E2E8F0] shadow-xs space-y-4 hover:border-emerald-400 transition-colors"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[#E2E8F0] gap-2">
+                      <div>
+                        <div className="flex items-center space-x-2">
+                          <span className="font-mono text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full">
+                            {lr.reportNumber}
+                          </span>
+                          <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full uppercase">
+                            {lr.reportStatus}
+                          </span>
+                        </div>
+                        <h3 className="text-base font-bold text-[#123B5D] mt-1">
+                          {lr.testName}
+                        </h3>
+                        <p className="text-xs text-[#64748B]">
+                          Department: <strong>{lr.labDepartment}</strong> • Referring Doctor: {lr.doctorName || (lr as any).referringDoctor || 'Dr. Arvind Sharma'}
+                        </p>
                       </div>
-                      <h3 className="text-base font-bold text-[#123B5D] mt-1">
-                        {lr.testName}
-                      </h3>
-                      <p className="text-xs text-[#64748B]">
-                        Department: <strong>{lr.labDepartment}</strong> • Referring Doctor: {lr.referringDoctor || 'Dr. Arvind Sharma'}
-                      </p>
+
+                      <div className="flex items-center space-x-2">
+                        <span className="text-xs text-[#64748B] hidden sm:block">
+                          Test Date: <strong className="text-[#1E293B]">{lr.testDate}</strong>
+                        </span>
+                        <button
+                          onClick={() => handleOpenLabReport(lr)}
+                          className="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-colors cursor-pointer shadow-xs"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          <span>Download Lab Report</span>
+                        </button>
+                      </div>
                     </div>
 
-                    <div className="flex items-center space-x-2">
-                      <span className="text-xs text-[#64748B] hidden sm:block">
-                        Test Date: <strong className="text-[#1E293B]">{lr.testDate}</strong>
-                      </span>
-                      <button
-                        onClick={() => handleOpenLabReport(lr)}
-                        className="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-colors cursor-pointer shadow-xs"
-                      >
-                        <Download className="w-3.5 h-3.5" />
-                        <span>Download Lab Report</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Lab Test Results Table */}
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs">
-                      <thead className="bg-[#F7FAFC] text-[#64748B] uppercase text-[10px] font-bold border-b border-[#E2E8F0]">
-                        <tr>
-                          <th className="py-2.5 px-3">Parameter Tested</th>
-                          <th className="py-2.5 px-3">Observed Result</th>
-                          <th className="py-2.5 px-3">Unit</th>
-                          <th className="py-2.5 px-3">Biological Reference Interval</th>
-                          <th className="py-2.5 px-3">Flag / Interpretation</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100">
-                        {lr.results.map((res, idx) => (
-                          <tr key={idx} className="hover:bg-[#F7FAFC]">
-                            <td className="py-2.5 px-3 font-semibold text-[#1E293B]">{res.parameter}</td>
-                            <td className="py-2.5 px-3 font-bold text-[#123B5D]">{res.result}</td>
-                            <td className="py-2.5 px-3 text-[#64748B]">{res.unit}</td>
-                            <td className="py-2.5 px-3 text-[#64748B]">{res.normalRange}</td>
-                            <td className="py-2.5 px-3">
-                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                                res.flag === 'Normal' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
-                              }`}>
-                                {res.flag || 'Normal'}
-                              </span>
-                            </td>
+                    {/* Lab Test Results Table */}
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-xs">
+                        <thead className="bg-[#F7FAFC] text-[#64748B] uppercase text-[10px] font-bold border-b border-[#E2E8F0]">
+                          <tr>
+                            <th className="py-2.5 px-3">Parameter Tested</th>
+                            <th className="py-2.5 px-3">Observed Result</th>
+                            <th className="py-2.5 px-3">Unit</th>
+                            <th className="py-2.5 px-3">Biological Reference Interval</th>
+                            <th className="py-2.5 px-3">Flag / Interpretation</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  {lr.pathologistImpression && (
-                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-[#1E293B]">
-                      <strong className="text-[#123B5D]">Pathologist Impression & Notes: </strong>
-                      {lr.pathologistImpression}
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                          {parsedResults.map((res, idx) => (
+                            <tr key={idx} className="hover:bg-[#F7FAFC]">
+                              <td className="py-2.5 px-3 font-semibold text-[#1E293B]">{res.parameter}</td>
+                              <td className="py-2.5 px-3 font-bold text-[#123B5D]">{res.result}</td>
+                              <td className="py-2.5 px-3 text-[#64748B]">{res.unit}</td>
+                              <td className="py-2.5 px-3 text-[#64748B]">{res.normalRange}</td>
+                              <td className="py-2.5 px-3">
+                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                                  res.flag === 'Normal' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+                                }`}>
+                                  {res.flag || 'Normal'}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
-                  )}
-                </div>
-              ))
+
+                    {(lr.findings || (lr as any).pathologistImpression) && (
+                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-[#1E293B]">
+                        <strong className="text-[#123B5D]">Pathologist Impression & Notes: </strong>
+                        {lr.findings || (lr as any).pathologistImpression}
+                      </div>
+                    )}
+                  </div>
+                );
+              })
           )}
         </div>
       )}

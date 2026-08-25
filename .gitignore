@@ -1,6 +1,8 @@
 # Dependencies
 node_modules/
 frontend/node_modules/
+mobile/node_modules/
+.expo/
 .pnpm-store/
 
 # Production builds
@@ -41,3 +43,4 @@ frontend/.env
 Thumbs.db
 *.swp
 *.swo
+~$*

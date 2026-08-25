@@ -390,7 +390,7 @@ export const DoctorPatientHistory: React.FC<{ hideTabs?: boolean }> = ({ hideTab
                 </div>
 
                 <div className="space-y-2">
-                  {activePrescription.medicines.map((m, idx) => (
+                  {(activePrescription.medicines || []).map((m, idx) => (
                     <div key={idx} className="p-3 bg-white rounded-xl border border-[#E2E8F0] text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1 shadow-2xs">
                       <div>
                         <span className="font-bold text-[#123B5D] text-xs block">{m.name}</span>

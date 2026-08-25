@@ -138,7 +138,7 @@ export const PrescriptionPDFModal: React.FC<PrescriptionPDFModalProps> = ({
             </tr>
           </thead>
           <tbody>
-            ${prescription.medicines.map((med, idx) => `
+            ${(prescription.medicines || []).map((med, idx) => `
               <tr>
                 <td style="font-weight: bold; color: #64748B;">${idx + 1}</td>
                 <td style="font-weight: bold; color: #123B5D;">${med.name}</td>
@@ -339,7 +339,7 @@ export const PrescriptionPDFModal: React.FC<PrescriptionPDFModalProps> = ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {prescription.medicines.map((med, idx) => (
+                  {(prescription.medicines || []).map((med, idx) => (
                     <tr key={med.id || idx}>
                       <td className="py-2 px-3 font-bold text-[#64748B]">{idx + 1}</td>
                       <td className="py-2 px-3 font-bold text-[#123B5D] text-xs">{med.name}</td>

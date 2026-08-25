@@ -144,7 +144,7 @@ export const PharmacyDashboard: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
-                    {selectedRx.medicines.map((m, i) => (
+                    {(selectedRx.medicines || []).map((m, i) => (
                       <tr key={i} className="hover:bg-[#F7FAFC]">
                         <td className="py-2.5 px-3 font-bold text-[#123B5D]">{m.name}</td>
                         <td className="py-2.5 px-3">{m.dosage}</td>

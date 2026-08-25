@@ -37,7 +37,7 @@ export const LandingPage: React.FC = () => {
 
   return (
     <div className="space-y-20 sm:space-y-24 animate-fadeIn font-sans text-[#1E293B] pb-16">
-      
+
       {/* HERO SECTION */}
       <section id="home" className="relative scroll-mt-24 pt-2 pb-2">
         <div className="relative rounded-3xl overflow-hidden text-[#0C2B4E] shadow-[0_12px_40px_-10px_rgba(2,132,199,0.12)] border border-sky-200/80 bg-gradient-to-br from-[#E0F2FE] via-[#F0F9FF] to-[#E6F4FE]">
@@ -102,10 +102,10 @@ export const LandingPage: React.FC = () => {
               {/* Stats */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-5 border-t border-sky-200/80">
                 {[
-                  { val: '350+',  label: 'Smart Inpatient Beds', color: 'text-[#0C2B4E]' },
-                  { val: '45+',   label: 'Senior Specialists',   color: 'text-[#0C2B4E]' },
-                  { val: '99.4%', label: 'Clinical Satisfaction',color: 'text-[#0D9488]' },
-                  { val: '24/7',  label: 'Trauma & ICU Support', color: 'text-[#0284C7]' },
+                  { val: '350+', label: 'Smart Inpatient Beds', color: 'text-[#0C2B4E]' },
+                  { val: '45+', label: 'Senior Specialists', color: 'text-[#0C2B4E]' },
+                  { val: '99.4%', label: 'Clinical Satisfaction', color: 'text-[#0D9488]' },
+                  { val: '24/7', label: 'Trauma & ICU Support', color: 'text-[#0284C7]' },
                 ].map(({ val, label, color }) => (
                   <div key={label} className="p-3 bg-white/80 hover:bg-white rounded-2xl border border-sky-100 shadow-xs transition-all backdrop-blur-md">
                     <p className={`text-xl sm:text-2xl font-extrabold tracking-tight ${color}`}>{val}</p>

@@ -1,0 +1,34 @@
+{
+  "expo": {
+    "name": "Healthcare EHR",
+    "slug": "healthcare-ehr",
+    "version": "1.0.0",
+    "sdkVersion": "54.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0C2B4E"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.healthcare.ehr"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0C2B4E"
+      },
+      "package": "com.healthcare.ehr",
+      "permissions": [
+        "INTERNET",
+        "ACCESS_NETWORK_STATE"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}

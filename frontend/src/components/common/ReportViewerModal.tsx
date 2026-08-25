@@ -408,22 +408,6 @@ export const ReportViewerModal: React.FC<ReportViewerModalProps> = ({
 
           <div className="flex items-center space-x-2">
             <button
-              onClick={handlePrint}
-              className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-bold flex items-center space-x-1.5 transition-all cursor-pointer border border-white/10"
-              title="Print Document"
-            >
-              <Printer className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Print</span>
-            </button>
-            <button
-              onClick={handleDownload}
-              className="px-3.5 py-1.5 bg-[#159A9C] hover:bg-[#123B5D] text-white rounded-lg text-xs font-bold flex items-center space-x-1.5 transition-all cursor-pointer shadow-xs"
-              title="Download Document"
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span>Download File</span>
-            </button>
-            <button
               onClick={onClose}
               className="p-1.5 text-slate-300 hover:text-white rounded-lg hover:bg-white/10 ml-1 transition-colors cursor-pointer"
               title="Close"
