@@ -195,7 +195,7 @@ def seed():
                 {'name': 'Atorvastatin', 'dosage': '10mg', 'frequency': 'Once daily after dinner', 'duration': '30 Days'},
                 {'name': 'Aspirin', 'dosage': '75mg', 'frequency': 'Once daily after breakfast', 'duration': '30 Days'}
             ],
-            'notes': 'Maintain low sodium diet and light morning walks.',
+            'advice': 'Maintain low sodium diet and light morning walks.',
             'status': 'Active'
         }
     )
